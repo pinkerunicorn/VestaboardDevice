@@ -242,7 +242,14 @@ class VestaboardGenerator extends IPSModule {
         return $visualLength;
     }
 
-    private function PadToRight($leftText, $rightIcon) {
+    private function PadToRight($leftText, $rightIcon = "") {
+        // Smart-Extraktion: Wenn das rechte Icon leer ist, aber der User am Ende des Textes
+        // einen Farbcode (z.B. {66}) angegeben hat, ziehen wir diesen automatisch nach ganz rechts.
+        if ($rightIcon === "" && preg_match('/\s*(\{\d{1,2}\})\s*$/', $leftText, $matches)) {
+            $rightIcon = $matches[1];
+            $leftText = preg_replace('/\s*\{\d{1,2}\}\s*$/', '', $leftText);
+        }
+        
         $leftLen = $this->GetVisualLength($leftText);
         $rightLen = $this->GetVisualLength($rightIcon);
         
