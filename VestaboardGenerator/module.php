@@ -1,5 +1,5 @@
 <?php
-class VestaboardManager extends IPSModule {
+class VestaboardGenerator extends IPSModule {
 
     public function Create() {
         parent::Create();

@@ -1,9 +1,9 @@
 {
     "id": "{B1C2D3E4-F5A6-7890-1234-56789ABCDEF1}",
-    "name": "Vestaboard Manager",
+    "name": "Vestaboard Generator",
     "type": 3,
     "vendor": "Florian Graßinger",
-    "aliases": ["Vestaboard Manager"],
+    "aliases": ["Vestaboard Generator"],
     "parentRequirements": [],
     "childRequirements": [],
     "implemented": [],
