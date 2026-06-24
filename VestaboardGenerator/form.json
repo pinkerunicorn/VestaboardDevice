@@ -47,7 +47,8 @@
                         { "label": "Ofen", "value": "ofen" },
                         { "label": "S-Bahn", "value": "sbahn" },
                         { "label": "Außentemperatur", "value": "aussen" },
-                        { "label": "Gartenbewässerung", "value": "garten" }
+                        { "label": "Gartenbewässerung", "value": "garten" },
+                        { "label": "Offene Fenster/Türen", "value": "fenster" }
                     ],
                     "width": "200px",
                     "add": "wm",
@@ -62,7 +63,8 @@
                             { "label": "Ofen", "value": "ofen" },
                             { "label": "S-Bahn", "value": "sbahn" },
                             { "label": "Außentemperatur", "value": "aussen" },
-                            { "label": "Gartenbewässerung", "value": "garten" }
+                            { "label": "Gartenbewässerung", "value": "garten" },
+                            { "label": "Offene Fenster/Türen", "value": "fenster" }
                         ]
                     }
                 },

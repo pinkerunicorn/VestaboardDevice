@@ -122,6 +122,13 @@ class VestaboardGenerator extends IPSModule {
                         $text = $this->PadToRight("Gartenbewaesserung", "{67}"); 
                     }
                     break;
+                case 'fenster':
+                    $val = (int)GetValue($id);
+                    if ($val > 0) {
+                        // Rote Anzeige {63} für offene Fenster
+                        $text = $this->PadToRight("Offene Fenster: " . $val, "{63}"); 
+                    }
+                    break;
             }
 
             if ($text != "") {
