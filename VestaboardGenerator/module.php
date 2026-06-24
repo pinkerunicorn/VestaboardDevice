@@ -67,15 +67,22 @@ class VestaboardGenerator extends IPSModule {
                     }
                     break;
                 case 'wm':
-                    $prozent = max(0, min(100, GetValue($id)));
-                    if ($prozent > 0) {
-                        $text = $this->GenerateProgressBar("WM", $prozent, "{68}");
-                    }
-                    break;
                 case 'tr':
-                    $prozent = max(0, min(100, GetValue($id)));
+                    $prozent = max(0, min(100, (int)GetValue($id)));
                     if ($prozent > 0) {
-                        $text = $this->GenerateProgressBar("TR", $prozent, "{67}");
+                        $prefix = ($type === 'tr') ? "TR" : "WM";
+                        $color = ($type === 'tr') ? "{67}" : "{68}";
+                        
+                        if ($format != "") {
+                            if (preg_match('/\{\d{1,2}\}/', $format, $matches)) {
+                                $color = $matches[0];
+                                $prefix = trim(str_replace($color, "", $format));
+                            } else {
+                                $prefix = $format;
+                            }
+                        }
+                        
+                        $text = $this->GenerateProgressBar($prefix, $prozent, $color);
                     }
                     break;
                 case 'brief':
@@ -240,14 +247,28 @@ class VestaboardGenerator extends IPSModule {
 
     private function GenerateProgressBar($prefix, $prozent, $defaultColor) {
         $colorCode = ($prozent >= 100) ? "{66}" : $defaultColor;
-        $text = sprintf("%s %3d%%: ", $prefix, $prozent);
         
-        $balkenBreite = 13;
-        $gefuellteSpalten = (int)round(($prozent / 100) * $balkenBreite);
-        $leereSpalten = $balkenBreite - $gefuellteSpalten;
+        $suffix = sprintf(" %d%%:", $prozent);
+        $prefixLen = mb_strlen($prefix, 'UTF-8');
+        $suffixLen = mb_strlen($suffix, 'UTF-8');
         
-        $balken = str_repeat($colorCode, $gefuellteSpalten) . str_repeat(" ", $leereSpalten);
-        return $text . $balken;
+        // Mindestens 5 Blöcke wollen wir für den Balken haben (Maximal also 17 Zeichen für Text)
+        if ($prefixLen + $suffixLen > 17) {
+            $prefix = mb_substr($prefix, 0, 17 - $suffixLen, 'UTF-8');
+            $prefixLen = mb_strlen($prefix, 'UTF-8');
+        }
+        
+        $text = $prefix . $suffix;
+        $balkenBreite = 22 - ($prefixLen + $suffixLen);
+        
+        if ($balkenBreite > 0) {
+            $gefuellteSpalten = (int)round(($prozent / 100) * $balkenBreite);
+            $leereSpalten = $balkenBreite - $gefuellteSpalten;
+            
+            $balken = str_repeat($colorCode, $gefuellteSpalten) . str_repeat(" ", $leereSpalten);
+            return $text . $balken;
+        }
+        return $text;
     }
 }
 ?>

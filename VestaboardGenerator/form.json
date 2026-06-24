@@ -39,8 +39,7 @@
                     "caption": "Typ",
                     "type": "Select",
                     "options": [
-                        { "label": "Waschmaschine", "value": "wm" },
-                        { "label": "Trockner", "value": "tr" },
+                        { "label": "Fortschrittsbalken", "value": "wm" },
                         { "label": "Briefkasten", "value": "brief" },
                         { "label": "Müllabfuhr", "value": "muell" },
                         { "label": "Keller Lüften", "value": "keller" },
@@ -56,8 +55,7 @@
                     "edit": {
                         "type": "Select",
                         "options": [
-                            { "label": "Waschmaschine", "value": "wm" },
-                            { "label": "Trockner", "value": "tr" },
+                            { "label": "Fortschrittsbalken", "value": "wm" },
                             { "label": "Briefkasten", "value": "brief" },
                             { "label": "Müllabfuhr", "value": "muell" },
                             { "label": "Keller Lüften", "value": "keller" },
