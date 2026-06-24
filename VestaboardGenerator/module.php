@@ -91,8 +91,17 @@ class VestaboardGenerator extends IPSModule {
                     break;
                 case 'sbahn':
                     $sbahnWert = (string)GetValue($id);
-                    // Kein spezielles rechtes Icon, aber Text wird garantiert auf 22 gekürzt
-                    $text = $this->PadToRight("S2: " . $sbahnWert, ""); 
+                    // Wenn Format hinterlegt, nimm das, sonst Default
+                    if ($format != "") {
+                        if (strpos($format, '%s') !== false) {
+                            $text = sprintf($format, $sbahnWert);
+                        } else {
+                            $text = $format . $sbahnWert;
+                        }
+                    } else {
+                        $text = "S2: " . $sbahnWert;
+                    }
+                    $text = $this->PadToRight($text, ""); 
                     break;
                 case 'aussen':
                     $temp = (float)GetValue($id);
@@ -100,7 +109,18 @@ class VestaboardGenerator extends IPSModule {
                     if ($temp < 0) $color = "{67}"; // Blau (Kalt)
                     if ($temp > 25) $color = "{63}"; // Rot (Warm)
                     
-                    $text = $this->PadToRight("Aussen: " . round($temp, 1) . "{62}C", $color);
+                    if ($format != "") {
+                        if (strpos($format, '%s') !== false || strpos($format, '%f') !== false) {
+                            $textStr = sprintf($format, round($temp, 1));
+                        } else {
+                            // Wenn sie z.B. nur "Pool: " eingegeben haben
+                            $textStr = $format . round($temp, 1) . "{62}C";
+                        }
+                    } else {
+                        $textStr = "Aussen: " . round($temp, 1) . "{62}C";
+                    }
+                    
+                    $text = $this->PadToRight($textStr, $color);
                     break;
                 case 'garten':
                     $val = GetValue($id);
