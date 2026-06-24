@@ -101,6 +101,12 @@ class VestaboardGenerator extends IPSModule {
                     
                     $text = $this->PadToRight("Aussen: " . round($temp, 1) . "{62}C", $color);
                     break;
+                case 'garten':
+                    if (GetValue($id)) {
+                        // Blaue Anzeige {67} für aktives Wasser
+                        $text = $this->PadToRight("Gartenbewaesserung", "{67}"); 
+                    }
+                    break;
             }
 
             if ($text != "") {
