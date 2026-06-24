@@ -52,6 +52,7 @@ class VestaboardGenerator extends IPSModule {
             $id = $row['VariableID'];
             $type = $row['Type'];
             $prio = isset($row['Priority']) ? $row['Priority'] : 'low';
+            $format = isset($row['FormatString']) ? $row['FormatString'] : '';
             
             $text = "";
             switch ($type) {
@@ -128,6 +129,27 @@ class VestaboardGenerator extends IPSModule {
                         // Rote Anzeige {63} für offene Sicherheitsbereiche
                         $text = $this->PadToRight("Offen: " . $val, "{63}"); 
                     }
+                    break;
+                case 'custom':
+                    $val = GetValue($id);
+                    if (is_bool($val)) {
+                        $val = $val ? 'Ein' : 'Aus';
+                    } else {
+                        $val = (string)$val;
+                    }
+                    
+                    if ($format != "") {
+                        if (strpos($format, '%s') !== false || strpos($format, '%d') !== false || strpos($format, '%f') !== false) {
+                            $text = sprintf($format, $val);
+                        } else {
+                            $text = $format . $val;
+                        }
+                    } else {
+                        $text = $val;
+                    }
+                    // Die Formatierung (inkl. Längenbegrenzung) anwenden. 
+                    // Farbcodes im Text werden durch GetVisualLength in PadToRight korrekt behandelt.
+                    $text = $this->PadToRight($text, "");
                     break;
             }
 

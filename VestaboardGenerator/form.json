@@ -48,7 +48,8 @@
                         { "label": "S-Bahn", "value": "sbahn" },
                         { "label": "Außentemperatur", "value": "aussen" },
                         { "label": "Gartenbewässerung", "value": "garten" },
-                        { "label": "Offene Fenster/Türen", "value": "fenster" }
+                        { "label": "Offene Fenster/Türen", "value": "fenster" },
+                        { "label": "Benutzerdefiniert (Text)", "value": "custom" }
                     ],
                     "width": "200px",
                     "add": "wm",
@@ -64,7 +65,8 @@
                             { "label": "S-Bahn", "value": "sbahn" },
                             { "label": "Außentemperatur", "value": "aussen" },
                             { "label": "Gartenbewässerung", "value": "garten" },
-                            { "label": "Offene Fenster/Türen", "value": "fenster" }
+                            { "label": "Offene Fenster/Türen", "value": "fenster" },
+                            { "label": "Benutzerdefiniert (Text)", "value": "custom" }
                         ]
                     }
                 },
@@ -75,6 +77,14 @@
                     "width": "auto",
                     "add": 0,
                     "edit": { "type": "SelectVariable" }
+                },
+                {
+                    "name": "FormatString",
+                    "caption": "Format / Prefix (für 'Benutzerdefiniert')",
+                    "type": "ValidationTextBox",
+                    "width": "300px",
+                    "add": "",
+                    "edit": { "type": "ValidationTextBox" }
                 }
             ]
         },
