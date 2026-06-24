@@ -52,14 +52,7 @@
                             { "label": "Benutzerdefiniert (Text)", "value": "custom" },
                             { "label": "Ereignis (Wahr/Falsch)", "value": "alert" },
                             { "label": "Fortschrittsbalken", "value": "wm" },
-                            { "label": "Temperatur", "value": "aussen" },
-                            { "label": "Briefkasten (Alt)", "value": "brief" },
-                            { "label": "Müll (Alt)", "value": "muell" },
-                            { "label": "Keller (Alt)", "value": "keller" },
-                            { "label": "Ofen (Alt)", "value": "ofen" },
-                            { "label": "S-Bahn (Alt)", "value": "sbahn" },
-                            { "label": "Garten (Alt)", "value": "garten" },
-                            { "label": "Fenster (Alt)", "value": "fenster" }
+                            { "label": "Temperatur", "value": "aussen" }
                         ]
                     }
                 },
