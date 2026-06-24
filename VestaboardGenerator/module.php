@@ -54,11 +54,6 @@ class VestaboardGenerator extends IPSModule {
             $prio = isset($row['Priority']) ? $row['Priority'] : 'low';
             $format = isset($row['FormatString']) ? $row['FormatString'] : '';
             
-            $text = "";
-            switch ($type) {
-                case 'ofen':
-                    if (GetValue($id)) {
-                        $text = $this->PadToRight("Ofen: Angefeuert", "{64}"); // {64} Orange
             $text = $this->GetLineText($type, $id, $format);
 
             if ($text != "") {
