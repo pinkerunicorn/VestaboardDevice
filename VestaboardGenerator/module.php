@@ -13,7 +13,7 @@ class VestaboardGenerator extends IPSModule {
         $this->RegisterPropertyInteger("VarIdOfen", 0);
         $this->RegisterPropertyInteger("VarIdSbahn", 0);
         $this->RegisterPropertyInteger("VarIdAussen", 0);
-        $this->RegisterPropertyInteger("VarIdPayloadOut", 0); // Die Variable, die das inkludierte Skript triggert
+        $this->RegisterPropertyInteger("InstIdVestaboardLocal", 0); // Die InstanzID vom Vestaboard Local Modul
     }
 
     public function ApplyChanges() {
@@ -113,28 +113,16 @@ class VestaboardGenerator extends IPSModule {
         // String zusammenbauen
         $textBasis = "";
         foreach ($finalLines as $line) {
-            $textBasis .= $line['text'] . "\\n";
+            $textBasis .= $line['text'] . "\n";
         }
-
-        // Output generieren
-        $inputArray = [
-            "components" => [
-                [
-                    "style" => [
-                        "justify" => "left",
-                        "align" => "center"
-                    ],
-                    "template" => rtrim($textBasis, "\\n")
-                ]
-            ]
-        ];
-        $input = json_encode($inputArray);
+        $textBasis = rtrim($textBasis, "\n"); // Letzten Zeilenumbruch entfernen
         
-        $idOut = $this->ReadPropertyInteger("VarIdPayloadOut");
-        if ($idOut > 0) {
-            SetValue($idOut, $input);
-            // Hier müsstest du überlegen, wie das inkludierte Sende-Skript aufgerufen wird. 
-            // Am besten bindest du dort ein Ereignis an die $idOut Variable, das triggert, sobald diese aktualisiert wird.
+        $instId = $this->ReadPropertyInteger("InstIdVestaboardLocal");
+        if ($instId > 0 && IPS_InstanceExists($instId)) {
+            // Direkt die Funktion der Vestaboard Local Instanz aufrufen
+            VESTA_SendMessage($instId, $textBasis);
+        } else {
+            IPS_LogMessage("Vestaboard Generator", "Keine gueltige Vestaboard Local Instanz hinterlegt.");
         }
     }
 

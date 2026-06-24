@@ -10,7 +10,7 @@
         { "type": "SelectVariable", "name": "VarIdSbahn", "label": "S-Bahn (String)" },
         { "type": "SelectVariable", "name": "VarIdAussen", "label": "Außentemperatur (Float/Integer)" },
         { "type": "Label", "label": "Ausgabe" },
-        { "type": "SelectVariable", "name": "VarIdPayloadOut", "label": "Ziel-Variable für Vestaboard-JSON" }
+        { "type": "SelectInstance", "name": "InstIdVestaboardLocal", "caption": "Vestaboard Local Instanz" }
     ],
     "actions": [
         { "type": "Button", "label": "Board jetzt manuell aktualisieren", "onClick": "VESTA_UpdateBoard($id);" }
