@@ -1,14 +1,46 @@
 {
     "elements": [
         { "type": "Label", "label": "Variablen-Zuordnung für das Vestaboard" },
-        { "type": "SelectVariable", "name": "VarIdWaschmaschine", "label": "Waschmaschine (%)" },
-        { "type": "SelectVariable", "name": "VarIdTrockner", "label": "Trockner (%)" },
-        { "type": "SelectVariable", "name": "VarIdBriefkasten", "label": "Briefkasten (Boolean)" },
-        { "type": "SelectVariable", "name": "VarIdMuell", "label": "Müllabfuhr (Integer)" },
-        { "type": "SelectVariable", "name": "VarIdKeller", "label": "Keller Lüften (Boolean)" },
-        { "type": "SelectVariable", "name": "VarIdOfen", "label": "Ofen (Boolean)" },
-        { "type": "SelectVariable", "name": "VarIdSbahn", "label": "S-Bahn (String)" },
-        { "type": "SelectVariable", "name": "VarIdAussen", "label": "Außentemperatur (Float/Integer)" },
+        { 
+            "type": "List", 
+            "name": "VariablesList", 
+            "caption": "Variablen Zuordnung",
+            "add": true,
+            "delete": true,
+            "columns": [
+                {
+                    "name": "Active",
+                    "caption": "Aktiv",
+                    "type": "CheckBox",
+                    "width": "80px",
+                    "add": true
+                },
+                {
+                    "name": "Type",
+                    "caption": "Typ",
+                    "type": "Select",
+                    "options": [
+                        { "label": "Waschmaschine", "value": "wm" },
+                        { "label": "Trockner", "value": "tr" },
+                        { "label": "Briefkasten", "value": "brief" },
+                        { "label": "Müllabfuhr", "value": "muell" },
+                        { "label": "Keller Lüften", "value": "keller" },
+                        { "label": "Ofen", "value": "ofen" },
+                        { "label": "S-Bahn", "value": "sbahn" },
+                        { "label": "Außentemperatur", "value": "aussen" }
+                    ],
+                    "width": "200px",
+                    "add": "wm"
+                },
+                {
+                    "name": "VariableID",
+                    "caption": "Variable",
+                    "type": "SelectVariable",
+                    "width": "auto",
+                    "add": 0
+                }
+            ]
+        },
         { "type": "Label", "label": "Ausgabe" },
         { "type": "SelectInstance", "name": "InstIdVestaboardLocal", "caption": "Vestaboard Local Instanz" }
     ],
