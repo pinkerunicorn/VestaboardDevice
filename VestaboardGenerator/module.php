@@ -126,7 +126,7 @@ class VestaboardGenerator extends IPSModule {
                     $val = (int)GetValue($id);
                     if ($val > 0) {
                         // Rote Anzeige {63} für offene Sicherheitsbereiche
-                        $text = $this->PadToRight("Tuer/Fenster offen: " . $val, "{63}"); 
+                        $text = $this->PadToRight("Offen: " . $val, "{63}"); 
                     }
                     break;
             }
