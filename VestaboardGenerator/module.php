@@ -36,19 +36,13 @@ class VestaboardGenerator extends IPSModule {
     }
 
     public function UpdateBoard() {
-        $lines = [];
+        $linesHigh = [];
+        $linesLow = [];
 
         $list = json_decode($this->ReadPropertyString("VariablesList"), true);
         if (!is_array($list)) {
             $list = [];
         }
-
-        // Nach der vom Nutzer gesetzten Priorität sortieren
-        usort($list, function($a, $b) {
-            $prioA = isset($a['Priority']) ? (int)$a['Priority'] : 99;
-            $prioB = isset($b['Priority']) ? (int)$b['Priority'] : 99;
-            return $prioA <=> $prioB;
-        });
 
         foreach ($list as $row) {
             if (!$row['Active'] || $row['VariableID'] == 0) {
@@ -57,52 +51,72 @@ class VestaboardGenerator extends IPSModule {
             
             $id = $row['VariableID'];
             $type = $row['Type'];
+            $prio = isset($row['Priority']) ? $row['Priority'] : 'low';
             
+            $text = "";
             switch ($type) {
                 case 'ofen':
                     if (GetValue($id)) {
-                        $lines[] = ["text" => "Ofen: Angefeuert {64}"];
+                        $text = "Ofen: Angefeuert {64}";
                     }
                     break;
                 case 'keller':
                     if (GetValue($id)) {
-                        $lines[] = ["text" => "Keller: Jetzt Lueften!"];
+                        $text = "Keller: Jetzt Lueften!";
                     }
                     break;
                 case 'wm':
                     $prozent = max(0, min(100, GetValue($id)));
                     if ($prozent > 0) {
-                        $lines[] = ["text" => $this->GenerateProgressBar("WM", $prozent, "{68}")];
+                        $text = $this->GenerateProgressBar("WM", $prozent, "{68}");
                     }
                     break;
                 case 'tr':
                     $prozent = max(0, min(100, GetValue($id)));
                     if ($prozent > 0) {
-                        $lines[] = ["text" => $this->GenerateProgressBar("TR", $prozent, "{67}")];
+                        $text = $this->GenerateProgressBar("TR", $prozent, "{67}");
                     }
                     break;
                 case 'brief':
                     if (GetValue($id)) {
-                        $lines[] = ["text" => "Briefkasten: Voll {64}"];
+                        $text = "Briefkasten: Voll {64}";
                     }
                     break;
                 case 'muell':
                     $muell = GetValue($id);
-                    if ($muell == 1) $lines[] = ["text" => "Muell: Bio   "];
-                    if ($muell == 2) $lines[] = ["text" => "Muell: Papier"];
-                    if ($muell == 3) $lines[] = ["text" => "Muell: Rest  "];
+                    if ($muell == 1) $text = "Muell: Bio   ";
+                    if ($muell == 2) $text = "Muell: Papier";
+                    if ($muell == 3) $text = "Muell: Rest  ";
                     break;
                 case 'sbahn':
-                    $lines[] = ["text" => "S2: " . GetValue($id)];
+                    $text = "S2: " . GetValue($id);
                     break;
                 case 'aussen':
-                    $lines[] = ["text" => "Aussen: " . GetValue($id) . " {62}C "];
+                    $text = "Aussen: " . GetValue($id) . " {62}C ";
                     break;
+            }
+
+            if ($text != "") {
+                if ($prio === 'high') {
+                    $linesHigh[] = ["text" => $text];
+                } else {
+                    $linesLow[] = ["text" => $text];
+                }
             }
         }
 
-        // Maximal 6 Zeilen extrahieren
-        $finalLines = array_slice($lines, 0, 6);
+        // Alle 'Hoch' Prioritäten einfügen
+        $finalLines = $linesHigh;
+
+        // Wenn noch Platz ist, fülle mit 'Niedrig' auf. 
+        // Das Vestaboard hat genau 6 nutzbare Zeilen.
+        $remainingSpace = 6 - count($finalLines);
+        if ($remainingSpace > 0) {
+            $finalLines = array_merge($finalLines, array_slice($linesLow, 0, $remainingSpace));
+        }
+
+        // Maximal 6 Zeilen extrahieren (falls es z.B. 7 High-Prios gibt)
+        $finalLines = array_slice($finalLines, 0, 6);
 
         // String zusammenbauen
         $textBasis = "";

@@ -7,18 +7,24 @@
             "caption": "Variablen Zuordnung",
             "add": true,
             "delete": true,
-            "sort": {
-                "column": "Priority",
-                "direction": "ascending"
-            },
             "columns": [
                 {
                     "name": "Priority",
                     "caption": "Prio",
-                    "type": "NumberSpinner",
-                    "width": "80px",
-                    "add": 10,
-                    "edit": { "type": "NumberSpinner" }
+                    "type": "Select",
+                    "options": [
+                        { "label": "Hoch", "value": "high" },
+                        { "label": "Niedrig", "value": "low" }
+                    ],
+                    "width": "100px",
+                    "add": "low",
+                    "edit": {
+                        "type": "Select",
+                        "options": [
+                            { "label": "Hoch", "value": "high" },
+                            { "label": "Niedrig", "value": "low" }
+                        ]
+                    }
                 },
                 {
                     "name": "Active",
