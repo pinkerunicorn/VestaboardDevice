@@ -39,32 +39,27 @@
                     "caption": "Typ",
                     "type": "Select",
                     "options": [
+                        { "label": "Benutzerdefiniert (Text)", "value": "custom" },
+                        { "label": "Ereignis (Wahr/Falsch)", "value": "alert" },
                         { "label": "Fortschrittsbalken", "value": "wm" },
-                        { "label": "Briefkasten", "value": "brief" },
-                        { "label": "Müllabfuhr", "value": "muell" },
-                        { "label": "Keller Lüften", "value": "keller" },
-                        { "label": "Ofen", "value": "ofen" },
-                        { "label": "S-Bahn", "value": "sbahn" },
-                        { "label": "Temperatur", "value": "aussen" },
-                        { "label": "Gartenbewässerung", "value": "garten" },
-                        { "label": "Offene Fenster/Türen", "value": "fenster" },
-                        { "label": "Benutzerdefiniert (Text)", "value": "custom" }
+                        { "label": "Temperatur", "value": "aussen" }
                     ],
                     "width": "200px",
-                    "add": "wm",
+                    "add": "custom",
                     "edit": {
                         "type": "Select",
                         "options": [
+                            { "label": "Benutzerdefiniert (Text)", "value": "custom" },
+                            { "label": "Ereignis (Wahr/Falsch)", "value": "alert" },
                             { "label": "Fortschrittsbalken", "value": "wm" },
-                            { "label": "Briefkasten", "value": "brief" },
-                            { "label": "Müllabfuhr", "value": "muell" },
-                            { "label": "Keller Lüften", "value": "keller" },
-                            { "label": "Ofen", "value": "ofen" },
-                            { "label": "S-Bahn", "value": "sbahn" },
                             { "label": "Temperatur", "value": "aussen" },
-                            { "label": "Gartenbewässerung", "value": "garten" },
-                            { "label": "Offene Fenster/Türen", "value": "fenster" },
-                            { "label": "Benutzerdefiniert (Text)", "value": "custom" }
+                            { "label": "Briefkasten (Alt)", "value": "brief" },
+                            { "label": "Müll (Alt)", "value": "muell" },
+                            { "label": "Keller (Alt)", "value": "keller" },
+                            { "label": "Ofen (Alt)", "value": "ofen" },
+                            { "label": "S-Bahn (Alt)", "value": "sbahn" },
+                            { "label": "Garten (Alt)", "value": "garten" },
+                            { "label": "Fenster (Alt)", "value": "fenster" }
                         ]
                     }
                 },

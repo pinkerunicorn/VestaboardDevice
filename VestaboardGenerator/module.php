@@ -59,127 +59,7 @@ class VestaboardGenerator extends IPSModule {
                 case 'ofen':
                     if (GetValue($id)) {
                         $text = $this->PadToRight("Ofen: Angefeuert", "{64}"); // {64} Orange
-                    }
-                    break;
-                case 'keller':
-                    if (GetValue($id)) {
-                        $text = $this->PadToRight("Keller lueften", "{67}"); // {67} Blau
-                    }
-                    break;
-                case 'wm':
-                case 'tr':
-                    $prozent = max(0, min(100, (int)GetValue($id)));
-                    if ($prozent > 0) {
-                        $prefix = ($type === 'tr') ? "TR" : "WM";
-                        $color = ($type === 'tr') ? "{67}" : "{68}";
-                        
-                        if ($format != "") {
-                            if (preg_match('/\{\d{1,2}\}/', $format, $matches)) {
-                                $color = $matches[0];
-                                $prefix = trim(str_replace($color, "", $format));
-                            } else {
-                                $prefix = $format;
-                            }
-                        }
-                        
-                        $text = $this->GenerateProgressBar($prefix, $prozent, $color);
-                    }
-                    break;
-                case 'brief':
-                    if (GetValue($id)) {
-                        $text = $this->PadToRight("Briefkasten voll", "{65}"); // {65} Gelb
-                    }
-                    break;
-                case 'muell':
-                    $muell = GetValue($id);
-                    if ($muell == 1) $text = $this->PadToRight("Biotonne", "{66}"); // Grün
-                    if ($muell == 2) $text = $this->PadToRight("Papiertonne", "{67}"); // Blau
-                    if ($muell == 3) $text = $this->PadToRight("Restmuell", "{70}"); // Schwarz
-                    break;
-                case 'sbahn':
-                    $sbahnWert = (string)GetValue($id);
-                    // Wenn Format hinterlegt, nimm das, sonst Default
-                    if ($format != "") {
-                        if (strpos($format, '%s') !== false) {
-                            $text = sprintf($format, $sbahnWert);
-                        } else {
-                            $text = $format . $sbahnWert;
-                        }
-                    } else {
-                        $text = "S2: " . $sbahnWert;
-                    }
-                    $text = $this->PadToRight($text, ""); 
-                    break;
-                case 'aussen':
-                    $temp = (float)GetValue($id);
-                    $color = "{69}"; // Weiß (Neutral)
-                    if ($temp < 0) $color = "{67}"; // Blau (Kalt)
-                    if ($temp > 25) $color = "{63}"; // Rot (Warm)
-                    
-                    if ($format != "") {
-                        if (strpos($format, '%s') !== false || strpos($format, '%f') !== false) {
-                            $textStr = sprintf($format, round($temp, 1));
-                        } else {
-                            // Wenn sie z.B. nur "Pool: " eingegeben haben
-                            $textStr = $format . round($temp, 1) . "{62}C";
-                        }
-                    } else {
-                        // Standardausgabe nur die Zahl + C
-                        $textStr = round($temp, 1) . "{62}C";
-                    }
-                    
-                    $text = $this->PadToRight($textStr, $color);
-                    break;
-                case 'garten':
-                    $val = GetValue($id);
-                    $isActive = false;
-                    
-                    if (is_bool($val)) {
-                        $isActive = $val;
-                    } else if (is_int($val) || is_float($val)) {
-                        $isActive = ($val > 0);
-                    } else if (is_string($val)) {
-                        // Kompatibilität mit SmartLawnAI "SummaryStatus" oder "Status_X"
-                        $valUpper = strtoupper($val);
-                        if (strpos($valUpper, 'WATERING') !== false || strpos($valUpper, 'BEWÄSSERE') !== false || strpos($valUpper, 'BEWAESSERE') !== false) {
-                            $isActive = true;
-                        }
-                    }
-
-                    if ($isActive) {
-                        // Blaue Anzeige {67} für aktives Wasser
-                        $text = $this->PadToRight("Gartenbewaesserung", "{67}"); 
-                    }
-                    break;
-                case 'fenster':
-                    $val = (int)GetValue($id);
-                    if ($val > 0) {
-                        // Rote Anzeige {63} für offene Sicherheitsbereiche
-                        $text = $this->PadToRight("Offen: " . $val, "{63}"); 
-                    }
-                    break;
-                case 'custom':
-                    $val = GetValue($id);
-                    if (is_bool($val)) {
-                        $val = $val ? 'Ein' : 'Aus';
-                    } else {
-                        $val = (string)$val;
-                    }
-                    
-                    if ($format != "") {
-                        if (strpos($format, '%s') !== false || strpos($format, '%d') !== false || strpos($format, '%f') !== false) {
-                            $text = sprintf($format, $val);
-                        } else {
-                            $text = $format . $val;
-                        }
-                    } else {
-                        $text = $val;
-                    }
-                    // Die Formatierung (inkl. Längenbegrenzung) anwenden. 
-                    // Farbcodes im Text werden durch GetVisualLength in PadToRight korrekt behandelt.
-                    $text = $this->PadToRight($text, "");
-                    break;
-            }
+            $text = $this->GetLineText($type, $id, $format);
 
             if ($text != "") {
                 if ($prio === 'high') {
@@ -217,6 +97,143 @@ class VestaboardGenerator extends IPSModule {
         } else {
             IPS_LogMessage("Vestaboard Generator", "Keine gueltige Vestaboard Local Instanz hinterlegt.");
         }
+    }
+
+    private function GetLineText($type, $id, $format) {
+        $text = "";
+        switch ($type) {
+            case 'alert':
+                $val = GetValue($id);
+                $isActive = (is_bool($val) && $val) || ((is_int($val) || is_float($val)) && $val > 0);
+                if ($isActive && $format != "") {
+                    $text = $this->PadToRight($format, "");
+                }
+                break;
+            case 'wm':
+            case 'tr':
+                $prozent = max(0, min(100, (int)GetValue($id)));
+                if ($prozent > 0) {
+                    $prefix = ($type === 'tr') ? "TR" : "WM";
+                    $color = ($type === 'tr') ? "{67}" : "{68}";
+                    
+                    if ($format != "") {
+                        if (preg_match('/\{\d{1,2}\}/', $format, $matches)) {
+                            $color = $matches[0];
+                            $prefix = trim(str_replace($color, "", $format));
+                        } else {
+                            $prefix = $format;
+                        }
+                    }
+                    
+                    $text = $this->GenerateProgressBar($prefix, $prozent, $color);
+                }
+                break;
+            case 'brief':
+                if (GetValue($id)) {
+                    $text = $this->PadToRight("Briefkasten voll", "{65}"); // {65} Gelb
+                }
+                break;
+            case 'muell':
+                $muell = GetValue($id);
+                if ($muell == 1) $text = $this->PadToRight("Biotonne", "{66}"); // Grün
+                if ($muell == 2) $text = $this->PadToRight("Papiertonne", "{67}"); // Blau
+                if ($muell == 3) $text = $this->PadToRight("Restmuell", "{70}"); // Schwarz
+                break;
+            case 'sbahn':
+                $sbahnWert = (string)GetValue($id);
+                // Wenn Format hinterlegt, nimm das, sonst Default
+                if ($format != "") {
+                    if (strpos($format, '%s') !== false) {
+                        $text = sprintf($format, $sbahnWert);
+                    } else {
+                        $text = $format . $sbahnWert;
+                    }
+                } else {
+                    $text = "S2: " . $sbahnWert;
+                }
+                $text = $this->PadToRight($text, ""); 
+                break;
+            case 'aussen':
+                $temp = (float)GetValue($id);
+                $color = "{69}"; // Weiß (Neutral)
+                if ($temp < 0) $color = "{67}"; // Blau (Kalt)
+                if ($temp > 25) $color = "{63}"; // Rot (Warm)
+                
+                if ($format != "") {
+                    if (strpos($format, '%s') !== false || strpos($format, '%f') !== false) {
+                        $textStr = sprintf($format, round($temp, 1));
+                    } else {
+                        // Wenn sie z.B. nur "Pool: " eingegeben haben
+                        $textStr = $format . round($temp, 1) . "{62}C";
+                    }
+                } else {
+                    // Standardausgabe nur die Zahl + C
+                    $textStr = round($temp, 1) . "{62}C";
+                }
+                
+                $text = $this->PadToRight($textStr, $color);
+                break;
+            case 'garten':
+                $val = GetValue($id);
+                $isActive = false;
+                
+                if (is_bool($val)) {
+                    $isActive = $val;
+                } else if (is_int($val) || is_float($val)) {
+                    $isActive = ($val > 0);
+                } else if (is_string($val)) {
+                    // Kompatibilität mit SmartLawnAI "SummaryStatus" oder "Status_X"
+                    $valUpper = strtoupper($val);
+                    if (strpos($valUpper, 'WATERING') !== false || strpos($valUpper, 'BEWÄSSERE') !== false || strpos($valUpper, 'BEWAESSERE') !== false) {
+                        $isActive = true;
+                    }
+                }
+
+                if ($isActive) {
+                    // Blaue Anzeige {67} für aktives Wasser
+                    $text = $this->PadToRight("Gartenbewaesserung", "{67}"); 
+                }
+                break;
+            case 'fenster':
+                $val = (int)GetValue($id);
+                if ($val > 0) {
+                    // Rote Anzeige {63} für offene Sicherheitsbereiche
+                    $text = $this->PadToRight("Offen: " . $val, "{63}"); 
+                }
+                break;
+            case 'keller':
+                if (GetValue($id)) {
+                    $text = $this->PadToRight("Keller lueften", "{67}"); // {67} Blau
+                }
+                break;
+            case 'ofen':
+                if (GetValue($id)) {
+                    $text = $this->PadToRight("Ofen: Angefeuert", "{64}"); // {64} Orange
+                }
+                break;
+            case 'custom':
+                $val = GetValue($id);
+                if (is_bool($val)) {
+                    $val = $val ? 'Ein' : 'Aus';
+                } else {
+                    $val = (string)$val;
+                }
+                
+                if ($format != "") {
+                    if (strpos($format, '%s') !== false || strpos($format, '%d') !== false || strpos($format, '%f') !== false) {
+                        $text = sprintf($format, $val);
+                    } else {
+                        $text = $format . $val;
+                    }
+                } else {
+                    $text = $val;
+                }
+                // Die Formatierung (inkl. Längenbegrenzung) anwenden. 
+                // Farbcodes im Text werden durch GetVisualLength in PadToRight korrekt behandelt.
+                $text = $this->PadToRight($text, "");
+                break;
+        }
+        return $text;
     }
 
     private function GetVisualLength($text) {
