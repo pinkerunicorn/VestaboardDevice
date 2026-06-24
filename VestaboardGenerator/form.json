@@ -46,7 +46,7 @@
                         { "label": "Keller Lüften", "value": "keller" },
                         { "label": "Ofen", "value": "ofen" },
                         { "label": "S-Bahn", "value": "sbahn" },
-                        { "label": "Außentemperatur", "value": "aussen" },
+                        { "label": "Temperatur", "value": "aussen" },
                         { "label": "Gartenbewässerung", "value": "garten" },
                         { "label": "Offene Fenster/Türen", "value": "fenster" },
                         { "label": "Benutzerdefiniert (Text)", "value": "custom" }
@@ -63,7 +63,7 @@
                             { "label": "Keller Lüften", "value": "keller" },
                             { "label": "Ofen", "value": "ofen" },
                             { "label": "S-Bahn", "value": "sbahn" },
-                            { "label": "Außentemperatur", "value": "aussen" },
+                            { "label": "Temperatur", "value": "aussen" },
                             { "label": "Gartenbewässerung", "value": "garten" },
                             { "label": "Offene Fenster/Türen", "value": "fenster" },
                             { "label": "Benutzerdefiniert (Text)", "value": "custom" }

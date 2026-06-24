@@ -117,7 +117,8 @@ class VestaboardGenerator extends IPSModule {
                             $textStr = $format . round($temp, 1) . "{62}C";
                         }
                     } else {
-                        $textStr = "Aussen: " . round($temp, 1) . "{62}C";
+                        // Standardausgabe nur die Zahl + C
+                        $textStr = round($temp, 1) . "{62}C";
                     }
                     
                     $text = $this->PadToRight($textStr, $color);
