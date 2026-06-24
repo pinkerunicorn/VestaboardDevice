@@ -213,10 +213,10 @@ class VestaboardGenerator extends IPSModule {
     }
 
     private function GetVisualLength($text) {
-        $visualLength = strlen($text);
+        $visualLength = mb_strlen($text, 'UTF-8');
         if (preg_match_all('/\{\d{1,2}\}/', $text, $matches)) {
             foreach ($matches[0] as $match) {
-                $visualLength -= strlen($match); 
+                $visualLength -= mb_strlen($match, 'UTF-8'); 
                 $visualLength += 1; 
             }
         }
@@ -228,9 +228,9 @@ class VestaboardGenerator extends IPSModule {
         $rightLen = $this->GetVisualLength($rightIcon);
         
         if ($leftLen + $rightLen > 22) {
-            // Kürzen (einfacher substr reicht, da zu lange Texte bei uns nur reiner Text von der S-Bahn sind)
+            // Kürzen
             $allowedLen = 22 - $rightLen;
-            $leftText = substr($leftText, 0, $allowedLen); 
+            $leftText = mb_substr($leftText, 0, $allowedLen, 'UTF-8'); 
             $leftLen = $this->GetVisualLength($leftText);
         }
         
