@@ -102,7 +102,22 @@ class VestaboardGenerator extends IPSModule {
                     $text = $this->PadToRight("Aussen: " . round($temp, 1) . "{62}C", $color);
                     break;
                 case 'garten':
-                    if (GetValue($id)) {
+                    $val = GetValue($id);
+                    $isActive = false;
+                    
+                    if (is_bool($val)) {
+                        $isActive = $val;
+                    } else if (is_int($val) || is_float($val)) {
+                        $isActive = ($val > 0);
+                    } else if (is_string($val)) {
+                        // Kompatibilität mit SmartLawnAI "SummaryStatus" oder "Status_X"
+                        $valUpper = strtoupper($val);
+                        if (strpos($valUpper, 'WATERING') !== false || strpos($valUpper, 'BEWÄSSERE') !== false || strpos($valUpper, 'BEWAESSERE') !== false) {
+                            $isActive = true;
+                        }
+                    }
+
+                    if ($isActive) {
                         // Blaue Anzeige {67} für aktives Wasser
                         $text = $this->PadToRight("Gartenbewaesserung", "{67}"); 
                     }
