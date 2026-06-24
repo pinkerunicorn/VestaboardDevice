@@ -1,0 +1,41 @@
+{
+    "elements": [
+        { "type": "Label", "label": "Verbindungseinstellungen" },
+        { "type": "ValidationTextBox", "name": "ApiUrl", "caption": "Vestaboard Local API URL" },
+        { "type": "PasswordTextBox", "name": "ApiKey", "caption": "Local API Key" },
+        
+        { "type": "Label", "label": "Standard Ausrichtung (Alignment)" },
+        { "type": "Select", "name": "AlignHorizontal", "caption": "Horizontal (Justify)", "options": [
+            { "label": "Links (left)", "value": "left" },
+            { "label": "Mittig (center)", "value": "center" },
+            { "label": "Rechts (right)", "value": "right" },
+            { "label": "Verteilt (justified)", "value": "justified" }
+        ]},
+        { "type": "Select", "name": "AlignVertical", "caption": "Vertikal (Align)", "options": [
+            { "label": "Oben (top)", "value": "top" },
+            { "label": "Mittig (center)", "value": "center" },
+            { "label": "Unten (bottom)", "value": "bottom" },
+            { "label": "Verteilt (justified)", "value": "justified" }
+        ]},
+        
+        { "type": "Label", "label": " " },
+        { "type": "Label", "label": "==========================================================" },
+        { "type": "Label", "label": "Vestaboard Farbcodes & Sonderzeichen (Info)" },
+        { "type": "Label", "label": "==========================================================" },
+        { "type": "Label", "label": "Farben:" },
+        { "type": "Label", "label": "{63} Rot    | {64} Orange | {65} Gelb" },
+        { "type": "Label", "label": "{66} Grün   | {67} Blau   | {68} Violett" },
+        { "type": "Label", "label": "{69} Weiß   | {70} Schwarz| {0}  Leer" },
+        { "type": "Label", "label": " " },
+        { "type": "Label", "label": "Sonderzeichen:" },
+        { "type": "Label", "label": "{37} !   | {38} @   | {39} #   | {40} $   | {41} (   | {42} )" },
+        { "type": "Label", "label": "{44} -   | {46} +   | {47} &   | {48} =   | {49} ;   | {50} :" },
+        { "type": "Label", "label": "{52} '   | {53} \"   | {54} %   | {55} ,   | {56} .   | {59} /" },
+        { "type": "Label", "label": "{60} ?   | {62} °" }
+    ],
+    "actions": [
+        { "type": "Label", "label": "Testbereich" },
+        { "type": "ValidationTextBox", "name": "TestText", "caption": "Test-Nachricht" },
+        { "type": "Button", "label": "Nachricht an Vestaboard senden", "onClick": "VESTA_SendMessage($id, $TestText);" }
+    ]
+}
