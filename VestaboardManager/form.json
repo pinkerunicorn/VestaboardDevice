@@ -1,0 +1,18 @@
+{
+    "elements": [
+        { "type": "Label", "label": "Variablen-Zuordnung für das Vestaboard" },
+        { "type": "SelectVariable", "name": "VarIdWaschmaschine", "label": "Waschmaschine (%)" },
+        { "type": "SelectVariable", "name": "VarIdTrockner", "label": "Trockner (%)" },
+        { "type": "SelectVariable", "name": "VarIdBriefkasten", "label": "Briefkasten (Boolean)" },
+        { "type": "SelectVariable", "name": "VarIdMuell", "label": "Müllabfuhr (Integer)" },
+        { "type": "SelectVariable", "name": "VarIdKeller", "label": "Keller Lüften (Boolean)" },
+        { "type": "SelectVariable", "name": "VarIdOfen", "label": "Ofen (Boolean)" },
+        { "type": "SelectVariable", "name": "VarIdSbahn", "label": "S-Bahn (String)" },
+        { "type": "SelectVariable", "name": "VarIdAussen", "label": "Außentemperatur (Float/Integer)" },
+        { "type": "Label", "label": "Ausgabe" },
+        { "type": "SelectVariable", "name": "VarIdPayloadOut", "label": "Ziel-Variable für Vestaboard-JSON" }
+    ],
+    "actions": [
+        { "type": "Button", "label": "Board jetzt manuell aktualisieren", "onClick": "VESTA_UpdateBoard($id);" }
+    ]
+}

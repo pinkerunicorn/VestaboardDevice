@@ -1,0 +1,11 @@
+{
+    "id": "{B1C2D3E4-F5A6-7890-1234-56789ABCDEF1}",
+    "name": "VestaboardManager",
+    "type": 3,
+    "vendor": "Florian Graßinger",
+    "aliases": ["Vestaboard Manager"],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "VESTA"
+}
