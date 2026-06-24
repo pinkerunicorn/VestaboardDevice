@@ -43,6 +43,13 @@ class VestaboardGenerator extends IPSModule {
             $list = [];
         }
 
+        // Nach der vom Nutzer gesetzten Priorität sortieren
+        usort($list, function($a, $b) {
+            $prioA = isset($a['Priority']) ? (int)$a['Priority'] : 99;
+            $prioB = isset($b['Priority']) ? (int)$b['Priority'] : 99;
+            return $prioA <=> $prioB;
+        });
+
         foreach ($list as $row) {
             if (!$row['Active'] || $row['VariableID'] == 0) {
                 continue;

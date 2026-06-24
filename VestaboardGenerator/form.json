@@ -7,13 +7,26 @@
             "caption": "Variablen Zuordnung",
             "add": true,
             "delete": true,
+            "sort": {
+                "column": "Priority",
+                "direction": "ascending"
+            },
             "columns": [
+                {
+                    "name": "Priority",
+                    "caption": "Prio",
+                    "type": "NumberSpinner",
+                    "width": "80px",
+                    "add": 10,
+                    "edit": { "type": "NumberSpinner" }
+                },
                 {
                     "name": "Active",
                     "caption": "Aktiv",
                     "type": "CheckBox",
                     "width": "80px",
-                    "add": true
+                    "add": true,
+                    "edit": { "type": "CheckBox" }
                 },
                 {
                     "name": "Type",
@@ -30,14 +43,28 @@
                         { "label": "Außentemperatur", "value": "aussen" }
                     ],
                     "width": "200px",
-                    "add": "wm"
+                    "add": "wm",
+                    "edit": {
+                        "type": "Select",
+                        "options": [
+                            { "label": "Waschmaschine", "value": "wm" },
+                            { "label": "Trockner", "value": "tr" },
+                            { "label": "Briefkasten", "value": "brief" },
+                            { "label": "Müllabfuhr", "value": "muell" },
+                            { "label": "Keller Lüften", "value": "keller" },
+                            { "label": "Ofen", "value": "ofen" },
+                            { "label": "S-Bahn", "value": "sbahn" },
+                            { "label": "Außentemperatur", "value": "aussen" }
+                        ]
+                    }
                 },
                 {
                     "name": "VariableID",
                     "caption": "Variable",
                     "type": "SelectVariable",
                     "width": "auto",
-                    "add": 0
+                    "add": 0,
+                    "edit": { "type": "SelectVariable" }
                 }
             ]
         },
