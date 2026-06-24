@@ -57,12 +57,12 @@ class VestaboardGenerator extends IPSModule {
             switch ($type) {
                 case 'ofen':
                     if (GetValue($id)) {
-                        $text = "Ofen: Angefeuert {64}";
+                        $text = $this->PadToRight("Ofen: Angefeuert", "{64}"); // {64} Orange
                     }
                     break;
                 case 'keller':
                     if (GetValue($id)) {
-                        $text = "Keller: Jetzt Lueften!";
+                        $text = $this->PadToRight("Keller lueften", "{67}"); // {67} Blau
                     }
                     break;
                 case 'wm':
@@ -79,20 +79,27 @@ class VestaboardGenerator extends IPSModule {
                     break;
                 case 'brief':
                     if (GetValue($id)) {
-                        $text = "Briefkasten: Voll {64}";
+                        $text = $this->PadToRight("Briefkasten voll", "{65}"); // {65} Gelb
                     }
                     break;
                 case 'muell':
                     $muell = GetValue($id);
-                    if ($muell == 1) $text = "Muell: Bio   ";
-                    if ($muell == 2) $text = "Muell: Papier";
-                    if ($muell == 3) $text = "Muell: Rest  ";
+                    if ($muell == 1) $text = $this->PadToRight("Biotonne", "{66}"); // Grün
+                    if ($muell == 2) $text = $this->PadToRight("Papiertonne", "{67}"); // Blau
+                    if ($muell == 3) $text = $this->PadToRight("Restmuell", "{70}"); // Schwarz
                     break;
                 case 'sbahn':
-                    $text = "S2: " . GetValue($id);
+                    $sbahnWert = (string)GetValue($id);
+                    // Kein spezielles rechtes Icon, aber Text wird garantiert auf 22 gekürzt
+                    $text = $this->PadToRight("S2: " . $sbahnWert, ""); 
                     break;
                 case 'aussen':
-                    $text = "Aussen: " . GetValue($id) . " {62}C ";
+                    $temp = (float)GetValue($id);
+                    $color = "{69}"; // Weiß (Neutral)
+                    if ($temp < 0) $color = "{67}"; // Blau (Kalt)
+                    if ($temp > 25) $color = "{63}"; // Rot (Warm)
+                    
+                    $text = $this->PadToRight("Aussen: " . round($temp, 1) . "{62}C", $color);
                     break;
             }
 
@@ -132,6 +139,32 @@ class VestaboardGenerator extends IPSModule {
         } else {
             IPS_LogMessage("Vestaboard Generator", "Keine gueltige Vestaboard Local Instanz hinterlegt.");
         }
+    }
+
+    private function GetVisualLength($text) {
+        $visualLength = strlen($text);
+        if (preg_match_all('/\{\d{1,2}\}/', $text, $matches)) {
+            foreach ($matches[0] as $match) {
+                $visualLength -= strlen($match); 
+                $visualLength += 1; 
+            }
+        }
+        return $visualLength;
+    }
+
+    private function PadToRight($leftText, $rightIcon) {
+        $leftLen = $this->GetVisualLength($leftText);
+        $rightLen = $this->GetVisualLength($rightIcon);
+        
+        if ($leftLen + $rightLen > 22) {
+            // Kürzen (einfacher substr reicht, da zu lange Texte bei uns nur reiner Text von der S-Bahn sind)
+            $allowedLen = 22 - $rightLen;
+            $leftText = substr($leftText, 0, $allowedLen); 
+            $leftLen = $this->GetVisualLength($leftText);
+        }
+        
+        $spacesNeeded = 22 - $leftLen - $rightLen;
+        return $leftText . str_repeat(" ", max(0, $spacesNeeded)) . $rightIcon;
     }
 
     private function GenerateProgressBar($prefix, $prozent, $defaultColor) {
