@@ -1,7 +1,10 @@
 <?php
-class VestaboardLocal extends IPSModule {
 
-    public function Create() {
+declare(strict_types=1);
+
+class VestaboardLocal extends IPSModuleStrict {
+
+    public function Create(): void {
         parent::Create();
         
         // Standard-Eigenschaften für das Konfigurationsformular anlegen
@@ -11,7 +14,7 @@ class VestaboardLocal extends IPSModule {
         $this->RegisterPropertyString("AlignVertical", "center");
     }
 
-    public function ApplyChanges() {
+    public function ApplyChanges(): void {
         parent::ApplyChanges();
 
         $localUrl = $this->ReadPropertyString("ApiUrl");
@@ -29,7 +32,7 @@ class VestaboardLocal extends IPSModule {
      * Sendet einen Text erst an den Vestaboard Cloud-Compiler und dann an das lokale Board
      * Aufruf: VESTA_SendMessage(InstanzID, "Dein Text");
      */
-    public function SendMessage(string $Text) {
+    public function SendMessage(string $Text): bool {
         $localUrl = $this->ReadPropertyString("ApiUrl");
         $apiKey = $this->ReadPropertyString("ApiKey");
         $justify = $this->ReadPropertyString("AlignHorizontal");
