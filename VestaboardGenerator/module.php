@@ -133,6 +133,13 @@ class VestaboardGenerator extends IPSModuleStrict {
 
     private function GetLineText(string $type, int $id, string $format): string {
         $text = "";
+        
+        if ($type !== 'text' && $type !== 'empty') {
+            if ($id <= 0 || !IPS_VariableExists($id)) {
+                return "";
+            }
+        }
+        
         switch ($type) {
             case 'alert':
                 $val = GetValue($id);
