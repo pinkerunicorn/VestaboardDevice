@@ -75,12 +75,13 @@ class VestaboardGenerator extends IPSModuleStrict {
             $format = isset($row['FormatString']) ? $row['FormatString'] : '';
             
             $text = $this->GetLineText($type, $id, $format);
+            $cleanText = trim(preg_replace('/\{\d{1,2}\}/', '', $text));
 
-            if ($text != "") {
+            if ($cleanText !== "") {
                 if ($prio === 'high') {
-                    $linesHigh[] = ["text" => $text];
+                    $linesHigh[] = ["text" => $text, "clean" => $cleanText];
                 } else {
-                    $linesLow[] = ["text" => $text];
+                    $linesLow[] = ["text" => $text, "clean" => $cleanText];
                 }
             }
         }
@@ -102,12 +103,8 @@ class VestaboardGenerator extends IPSModuleStrict {
         $textBasis = "";
         for ($i = 0; $i < 6; $i++) {
             if (isset($finalLines[$i])) {
-                $lineText = $finalLines[$i]['text'];
-                $textBasis .= $lineText . "\n";
-                
-                // Für das WebFront die Farbcodes ausblenden, damit es sauber lesbar ist
-                $cleanText = trim(preg_replace('/\{\d{1,2}\}/', '', $lineText));
-                $this->SetValue("Line" . ($i + 1), $cleanText);
+                $textBasis .= $finalLines[$i]['text'] . "\n";
+                $this->SetValue("Line" . ($i + 1), $finalLines[$i]['clean']);
             } else {
                 $this->SetValue("Line" . ($i + 1), "");
             }
