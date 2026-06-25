@@ -105,6 +105,16 @@
                     "maximum": 23
                 }
             ]
+        },
+        {
+            "type": "Label",
+            "caption": "Puffer-Zeit für Updates (in Sekunden)"
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "UpdateDelaySeconds",
+            "caption": "Sammel-Verzögerung für Updates",
+            "minimum": 0
         }
     ],
     "actions": [
