@@ -3,6 +3,7 @@
     "name": "Vestaboard Generator",
     "type": 3,
     "vendor": "Florian Graßinger",
+    "url": "https://github.com/pinkerunicorn/VestaboardDevice",
     "aliases": ["Vestaboard Generator"],
     "parentRequirements": [],
     "childRequirements": [],
