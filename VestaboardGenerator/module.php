@@ -1,7 +1,9 @@
 <?php
-class VestaboardGenerator extends IPSModule {
+declare(strict_types=1);
 
-    public function Create() {
+class VestaboardGenerator extends IPSModuleStrict {
+
+    public function Create(): void {
         parent::Create();
         
         // Eigenschaften (Eingabefelder für die Instanz) anlegen
@@ -14,7 +16,7 @@ class VestaboardGenerator extends IPSModule {
         $this->RegisterTimer("VestaboardUpdateTimer", 0, 'VESTA_UpdateBoard($_IPS[\'TARGET\']);');
     }
 
-    public function ApplyChanges() {
+    public function ApplyChanges(): void {
         parent::ApplyChanges();
         
         // Alte Registrierungen löschen
@@ -35,7 +37,7 @@ class VestaboardGenerator extends IPSModule {
         }
     }
 
-    public function MessageSink($TimeStamp, $SenderID, $Message, $Data) {
+    public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void {
         // Wird aufgerufen, wenn sich eine der überwachten Variablen ändert
         $delay = $this->ReadPropertyInteger("UpdateDelaySeconds");
         if ($delay > 0) {
@@ -47,7 +49,7 @@ class VestaboardGenerator extends IPSModule {
         }
     }
 
-    public function UpdateBoard() {
+    public function UpdateBoard(): void {
         $this->SetTimerInterval('VestaboardUpdateTimer', 0);
         
         $linesHigh = [];
@@ -129,7 +131,7 @@ class VestaboardGenerator extends IPSModule {
         }
     }
 
-    private function GetLineText($type, $id, $format) {
+    private function GetLineText(string $type, int $id, string $format): string {
         $text = "";
         switch ($type) {
             case 'alert':
@@ -203,7 +205,7 @@ class VestaboardGenerator extends IPSModule {
         return $text;
     }
 
-    private function GetVisualLength($text) {
+    private function GetVisualLength(string $text): int {
         $visualLength = mb_strlen($text, 'UTF-8');
         if (preg_match_all('/\{\d{1,2}\}/', $text, $matches)) {
             foreach ($matches[0] as $match) {
@@ -213,13 +215,13 @@ class VestaboardGenerator extends IPSModule {
         }
         return $visualLength;
     }
-    private function SanitizeTextForVestaboard($text) {
+    private function SanitizeTextForVestaboard(string $text): string {
         $search = ['ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü', 'ß'];
         $replace = ['ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue', 'ss'];
         return str_replace($search, $replace, $text);
     }
 
-    private function PadToRight($leftText, $rightIcon = "") {
+    private function PadToRight(string $leftText, string $rightIcon = ""): string {
         $leftText = $this->SanitizeTextForVestaboard($leftText);
         // Smart-Extraktion: Wenn das rechte Icon leer ist, aber der User am Ende des Textes
         // einen Farbcode (z.B. {66}) angegeben hat, ziehen wir diesen automatisch nach ganz rechts.
@@ -242,7 +244,7 @@ class VestaboardGenerator extends IPSModule {
         return $leftText . str_repeat(" ", max(0, $spacesNeeded)) . $rightIcon;
     }
 
-    private function GenerateProgressBar($prefix, $prozent, $defaultColor) {
+    private function GenerateProgressBar(string $prefix, int $prozent, string $defaultColor): string {
         $prefix = $this->SanitizeTextForVestaboard($prefix);
         $colorCode = ($prozent >= 100) ? "{66}" : $defaultColor;
         
