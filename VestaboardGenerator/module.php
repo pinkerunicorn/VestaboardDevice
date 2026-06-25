@@ -39,7 +39,9 @@ class VestaboardGenerator extends IPSModule {
         // Wird aufgerufen, wenn sich eine der überwachten Variablen ändert
         $delay = $this->ReadPropertyInteger("UpdateDelaySeconds");
         if ($delay > 0) {
-            $this->SetTimerInterval('VestaboardUpdateTimer', $delay * 1000);
+            if ($this->GetTimerInterval('VestaboardUpdateTimer') == 0) {
+                $this->SetTimerInterval('VestaboardUpdateTimer', $delay * 1000);
+            }
         } else {
             $this->UpdateBoard();
         }
