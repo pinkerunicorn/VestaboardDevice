@@ -178,8 +178,14 @@ class VestaboardGenerator extends IPSModule {
         }
         return $visualLength;
     }
+    private function SanitizeTextForVestaboard($text) {
+        $search = ['ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü', 'ß'];
+        $replace = ['ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue', 'ss'];
+        return str_replace($search, $replace, $text);
+    }
 
     private function PadToRight($leftText, $rightIcon = "") {
+        $leftText = $this->SanitizeTextForVestaboard($leftText);
         // Smart-Extraktion: Wenn das rechte Icon leer ist, aber der User am Ende des Textes
         // einen Farbcode (z.B. {66}) angegeben hat, ziehen wir diesen automatisch nach ganz rechts.
         if ($rightIcon === "" && preg_match('/\s*(\{\d{1,2}\})\s*$/', $leftText, $matches)) {
@@ -202,6 +208,7 @@ class VestaboardGenerator extends IPSModule {
     }
 
     private function GenerateProgressBar($prefix, $prozent, $defaultColor) {
+        $prefix = $this->SanitizeTextForVestaboard($prefix);
         $colorCode = ($prozent >= 100) ? "{66}" : $defaultColor;
         
         $suffix = sprintf(" %d%%:", $prozent);
