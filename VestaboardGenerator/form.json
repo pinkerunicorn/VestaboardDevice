@@ -74,8 +74,38 @@
                 }
             ]
         },
-        { "type": "Label", "label": "Ausgabe" },
-        { "type": "SelectInstance", "name": "InstIdVestaboardLocal", "caption": "Vestaboard Local Instanz" }
+        {
+            "type": "Label",
+            "caption": "Ziel-Instanz"
+        },
+        {
+            "type": "SelectInstance",
+            "name": "InstIdVestaboardLocal",
+            "caption": "Vestaboard Local Instanz"
+        },
+        {
+            "type": "Label",
+            "caption": "Aktivitäts-Zeitraum (außerhalb dieser Stunden wird nicht gesendet)"
+        },
+        {
+            "type": "RowLayout",
+            "items": [
+                {
+                    "type": "NumberSpinner",
+                    "name": "ActiveTimeStart",
+                    "caption": "Start-Stunde (z.B. 7)",
+                    "minimum": 0,
+                    "maximum": 23
+                },
+                {
+                    "type": "NumberSpinner",
+                    "name": "ActiveTimeEnd",
+                    "caption": "End-Stunde (z.B. 22)",
+                    "minimum": 0,
+                    "maximum": 23
+                }
+            ]
+        }
     ],
     "actions": [
         { "type": "Button", "label": "Board jetzt manuell aktualisieren", "onClick": "VESTA_UpdateBoard($id);" }

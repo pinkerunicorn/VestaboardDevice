@@ -7,6 +7,8 @@ class VestaboardGenerator extends IPSModule {
         // Eigenschaften (Eingabefelder für die Instanz) anlegen
         $this->RegisterPropertyString("VariablesList", "[]");
         $this->RegisterPropertyInteger("InstIdVestaboardLocal", 0); // Die InstanzID vom Vestaboard Local Modul
+        $this->RegisterPropertyInteger("ActiveTimeStart", 7);
+        $this->RegisterPropertyInteger("ActiveTimeEnd", 22);
     }
 
     public function ApplyChanges() {
@@ -86,9 +88,30 @@ class VestaboardGenerator extends IPSModule {
         $textBasis = rtrim($textBasis, "\n"); // Letzten Zeilenumbruch entfernen
         
         $instId = $this->ReadPropertyInteger("InstIdVestaboardLocal");
+        $activeStart = $this->ReadPropertyInteger("ActiveTimeStart");
+        $activeEnd = $this->ReadPropertyInteger("ActiveTimeEnd");
+        $currentHour = (int)date('G');
+
+        $isActiveTime = true;
+        if ($activeStart != $activeEnd) {
+            if ($activeStart < $activeEnd) {
+                if ($currentHour < $activeStart || $currentHour >= $activeEnd) {
+                    $isActiveTime = false;
+                }
+            } else {
+                if ($currentHour >= $activeEnd && $currentHour < $activeStart) {
+                    $isActiveTime = false;
+                }
+            }
+        }
+
         if ($instId > 0 && IPS_InstanceExists($instId)) {
-            // Direkt die Funktion der Vestaboard Local Instanz aufrufen
-            VESTA_SendMessage($instId, $textBasis);
+            if ($isActiveTime) {
+                // Direkt die Funktion der Vestaboard Local Instanz aufrufen
+                VESTA_SendMessage($instId, $textBasis);
+            } else {
+                IPS_LogMessage("Vestaboard Generator", "Aktualisierung uebersprungen (Ruhezeit aktiv: " . $currentHour . " Uhr)");
+            }
         } else {
             IPS_LogMessage("Vestaboard Generator", "Keine gueltige Vestaboard Local Instanz hinterlegt.");
         }
