@@ -14,6 +14,10 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->RegisterPropertyInteger("UpdateDelaySeconds", 60);
 
         $this->RegisterTimer("VestaboardUpdateTimer", 0, 'VESTA_UpdateBoard($_IPS[\'TARGET\']);');
+
+        for ($i = 1; $i <= 6; $i++) {
+            $this->RegisterVariableString("Line{$i}", "Zeile {$i}", "", $i);
+        }
     }
 
     public function ApplyChanges(): void {
@@ -94,10 +98,19 @@ class VestaboardGenerator extends IPSModuleStrict {
         // Maximal 6 Zeilen extrahieren (falls es z.B. 7 High-Prios gibt)
         $finalLines = array_slice($finalLines, 0, 6);
 
-        // String zusammenbauen
+        // String zusammenbauen und Variablen updaten
         $textBasis = "";
-        foreach ($finalLines as $line) {
-            $textBasis .= $line['text'] . "\n";
+        for ($i = 0; $i < 6; $i++) {
+            if (isset($finalLines[$i])) {
+                $lineText = $finalLines[$i]['text'];
+                $textBasis .= $lineText . "\n";
+                
+                // Für das WebFront die Farbcodes ausblenden, damit es sauber lesbar ist
+                $cleanText = trim(preg_replace('/\{\d{1,2}\}/', '', $lineText));
+                $this->SetValue("Line" . ($i + 1), $cleanText);
+            } else {
+                $this->SetValue("Line" . ($i + 1), "");
+            }
         }
         $textBasis = rtrim($textBasis, "\n"); // Letzten Zeilenumbruch entfernen
         
