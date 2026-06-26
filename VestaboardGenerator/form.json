@@ -107,6 +107,11 @@
             ]
         },
         {
+            "type": "ValidationTextBox",
+            "name": "SleepText",
+            "caption": "Abschalttext (wird beim Erreichen der End-Stunde gesendet, falls nicht leer)"
+        },
+        {
             "type": "Label",
             "caption": "Puffer-Zeit für Updates (in Sekunden)"
         },

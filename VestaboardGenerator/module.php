@@ -12,8 +12,10 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->RegisterPropertyInteger("ActiveTimeStart", 7);
         $this->RegisterPropertyInteger("ActiveTimeEnd", 22);
         $this->RegisterPropertyInteger("UpdateDelaySeconds", 60);
+        $this->RegisterPropertyString("SleepText", "");
 
         $this->RegisterTimer("VestaboardUpdateTimer", 0, 'VESTA_UpdateBoard($_IPS[\'TARGET\']);');
+        $this->RegisterTimer("VestaboardSleepTimer", 0, 'VESTA_SendSleepText($_IPS[\'TARGET\']);');
 
         for ($i = 1; $i <= 6; $i++) {
             $this->RegisterVariableString("Line{$i}", "Zeile {$i}", "", $i);
@@ -39,6 +41,8 @@ class VestaboardGenerator extends IPSModuleStrict {
                 }
             }
         }
+        
+        $this->UpdateSleepTimer();
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void {
@@ -286,6 +290,39 @@ class VestaboardGenerator extends IPSModuleStrict {
             return $text . $balken;
         }
         return $text;
+    }
+
+    public function SendSleepText(): void {
+        $sleepText = $this->ReadPropertyString("SleepText");
+        $instId = $this->ReadPropertyInteger("InstIdVestaboardLocal");
+
+        if ($sleepText !== "" && $instId > 0 && IPS_InstanceExists($instId)) {
+            VESTA_SendMessage($instId, $sleepText);
+        }
+        
+        $this->UpdateSleepTimer();
+    }
+
+    private function UpdateSleepTimer(): void {
+        $activeEnd = $this->ReadPropertyInteger("ActiveTimeEnd");
+        $sleepText = $this->ReadPropertyString("SleepText");
+
+        if ($sleepText === "") {
+            $this->SetTimerInterval("VestaboardSleepTimer", 0);
+            return;
+        }
+
+        $now = time();
+        // mktime(hour, minute, second, month, day, year)
+        $targetTime = mktime($activeEnd, 0, 0, (int)date('m'), (int)date('d'), (int)date('Y'));
+
+        if ($targetTime <= $now) {
+            // Wenn die Zeit für heute schon vorbei ist, auf morgen setzen
+            $targetTime = strtotime('+1 day', $targetTime);
+        }
+
+        $interval = ($targetTime - $now) * 1000;
+        $this->SetTimerInterval("VestaboardSleepTimer", $interval);
     }
 }
 ?>
