@@ -11,7 +11,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->RegisterPropertyInteger("InstIdVestaboardLocal", 0); // Die InstanzID vom Vestaboard Local Modul
         $this->RegisterPropertyInteger("ActiveTimeStart", 7);
         $this->RegisterPropertyInteger("ActiveTimeEnd", 22);
-        $this->RegisterPropertyInteger("UpdateDelaySeconds", 60);
+        $this->RegisterPropertyInteger("UpdateDelayMinutes", 1);
         $this->RegisterPropertyString("SleepText", "");
 
         $this->RegisterTimer("VestaboardUpdateTimer", 0, 'VESTA_UpdateBoard($_IPS[\'TARGET\']);');
@@ -47,10 +47,11 @@ class VestaboardGenerator extends IPSModuleStrict {
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void {
         // Wird aufgerufen, wenn sich eine der überwachten Variablen ändert
-        $delay = $this->ReadPropertyInteger("UpdateDelaySeconds");
-        if ($delay > 0) {
+        $delayMin = $this->ReadPropertyInteger("UpdateDelayMinutes");
+        $delaySec = $delayMin * 60;
+        if ($delaySec > 0) {
             if ($this->GetTimerInterval('VestaboardUpdateTimer') == 0) {
-                $this->SetTimerInterval('VestaboardUpdateTimer', $delay * 1000);
+                $this->SetTimerInterval('VestaboardUpdateTimer', $delaySec * 1000);
             }
         } else {
             $this->UpdateBoard();

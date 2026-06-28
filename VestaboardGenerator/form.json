@@ -113,12 +113,12 @@
         },
         {
             "type": "Label",
-            "caption": "Puffer-Zeit für Updates (in Sekunden)"
+            "caption": "Puffer-Zeit für Updates (in Minuten)"
         },
         {
             "type": "NumberSpinner",
-            "name": "UpdateDelaySeconds",
-            "caption": "Sammel-Verzögerung für Updates",
+            "name": "UpdateDelayMinutes",
+            "caption": "Sammel-Verzögerung für Updates (in Minuten)",
             "minimum": 0
         }
     ],
