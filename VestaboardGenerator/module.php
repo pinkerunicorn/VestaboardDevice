@@ -11,6 +11,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->RegisterPropertyInteger("InstIdVestaboardLocal", 0); // Die InstanzID vom Vestaboard Local Modul
         $this->RegisterPropertyInteger("ActiveTimeStart", 7);
         $this->RegisterPropertyInteger("ActiveTimeEnd", 22);
+        $this->RegisterPropertyInteger("UpdateDelaySeconds", 60); // Muss für Abwärtskompatibilität bleiben
         $this->RegisterPropertyInteger("UpdateDelayMinutes", 1);
         $this->RegisterPropertyString("SleepText", "");
 
