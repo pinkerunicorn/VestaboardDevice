@@ -9,6 +9,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         // Eigenschaften (Eingabefelder für die Instanz) anlegen
         $this->RegisterPropertyString("VariablesList", "[]");
         $this->RegisterPropertyInteger("InstIdVestaboardLocal", 0); // Die InstanzID vom Vestaboard Local Modul
+        $this->RegisterPropertyInteger("ManualUpdateTriggerID", 0); // Trigger für manuelles Update
         $this->RegisterPropertyInteger("ActiveTimeStart", 7);
         $this->RegisterPropertyInteger("ActiveTimeEnd", 22);
         $this->RegisterPropertyInteger("UpdateDelaySeconds", 60); // Muss für Abwärtskompatibilität bleiben
@@ -43,10 +44,21 @@ class VestaboardGenerator extends IPSModuleStrict {
             }
         }
         
+        $triggerId = $this->ReadPropertyInteger("ManualUpdateTriggerID");
+        if ($triggerId > 0 && IPS_VariableExists($triggerId)) {
+            $this->RegisterMessage($triggerId, VM_UPDATE);
+        }
+        
         $this->UpdateSleepTimer();
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void {
+        $triggerId = $this->ReadPropertyInteger("ManualUpdateTriggerID");
+        if ($triggerId > 0 && $SenderID == $triggerId) {
+            $this->UpdateBoard();
+            return;
+        }
+
         // Wird aufgerufen, wenn sich eine der überwachten Variablen ändert
         $delayMin = $this->ReadPropertyInteger("UpdateDelayMinutes");
         $delaySec = $delayMin * 60;

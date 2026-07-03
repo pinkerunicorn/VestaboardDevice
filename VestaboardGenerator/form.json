@@ -85,6 +85,15 @@
         },
         {
             "type": "Label",
+            "caption": "Manueller Trigger"
+        },
+        {
+            "type": "SelectVariable",
+            "name": "ManualUpdateTriggerID",
+            "caption": "Auslöser-Variable (z.B. Button oder Schalter, aktualisiert sofort)"
+        },
+        {
+            "type": "Label",
             "caption": "Aktivitäts-Zeitraum (außerhalb dieser Stunden wird nicht gesendet)"
         },
         {
