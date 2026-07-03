@@ -132,6 +132,6 @@
         }
     ],
     "actions": [
-        { "type": "Button", "label": "Board jetzt manuell aktualisieren", "onClick": "VESTA_UpdateBoard($id);" }
+        { "type": "Button", "label": "Board jetzt manuell aktualisieren", "onClick": "VESTA_UpdateBoard($id, true);" }
     ]
 }
