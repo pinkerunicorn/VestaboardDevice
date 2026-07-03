@@ -55,7 +55,7 @@ class VestaboardGenerator extends IPSModuleStrict {
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void {
         $triggerId = $this->ReadPropertyInteger("ManualUpdateTriggerID");
         if ($triggerId > 0 && $SenderID == $triggerId) {
-            $this->UpdateBoard();
+            $this->UpdateBoard(true); // Manuelles Update erzwingen
             return;
         }
 
@@ -71,7 +71,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
     }
 
-    public function UpdateBoard(): void {
+    public function UpdateBoard(bool $force = false): void {
         $this->SetTimerInterval('VestaboardUpdateTimer', 0);
         
         $linesHigh = [];
@@ -148,7 +148,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
 
         if ($instId > 0 && IPS_InstanceExists($instId)) {
-            if ($isActiveTime) {
+            if ($isActiveTime || $force) {
                 // Direkt die Funktion der Vestaboard Local Instanz aufrufen
                 VESTA_SendMessage($instId, $textBasis);
             } else {
