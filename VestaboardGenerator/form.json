@@ -5,6 +5,7 @@
             "type": "List", 
             "name": "VariablesList", 
             "caption": "Variablen Zuordnung",
+            "rowCount": 15,
             "add": true,
             "delete": true,
             "columns": [
