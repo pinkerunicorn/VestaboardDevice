@@ -152,10 +152,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                 // Direkt die Funktion der Vestaboard Local Instanz aufrufen
                 VESTA_SendMessage($instId, $textBasis);
             } else {
-                IPS_LogMessage("Vestaboard Generator", "Aktualisierung uebersprungen (Ruhezeit aktiv: " . $currentHour . " Uhr)");
+                IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . "Aktualisierung uebersprungen (Ruhezeit aktiv: " . $currentHour . " Uhr)");
             }
         } else {
-            IPS_LogMessage("Vestaboard Generator", "Keine gueltige Vestaboard Local Instanz hinterlegt.");
+            IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . "Keine gueltige Vestaboard Local Instanz hinterlegt.");
         }
     }
 

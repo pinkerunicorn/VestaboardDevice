@@ -39,7 +39,7 @@ class VestaboardLocal extends IPSModuleStrict {
         $align = $this->ReadPropertyString("AlignVertical");
 
         if (empty($localUrl) || empty($apiKey)) {
-            IPS_LogMessage("Vestaboard", "Fehler: Lokale URL oder API-Key nicht konfiguriert.");
+            IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardLocal: ' . "Fehler: Lokale URL oder API-Key nicht konfiguriert.");
             return false;
         }
 
@@ -74,7 +74,7 @@ class VestaboardLocal extends IPSModuleStrict {
 
         // Prüfen, ob die Cloud ein sauberes JSON-Array zurückgeliefert hat
         if ($cloudHttpCode < 200 || $cloudHttpCode >= 300 || empty($compiledBoardJson)) {
-            IPS_LogMessage("Vestaboard", "Cloud-Kompilierung fehlgeschlagen! HTTP Code: " . $cloudHttpCode);
+            IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardLocal: ' . "Cloud-Kompilierung fehlgeschlagen! HTTP Code: " . $cloudHttpCode);
             return false;
         }
 
@@ -98,7 +98,7 @@ class VestaboardLocal extends IPSModuleStrict {
         $responseLocal = curl_exec($chLocal);
         
         if (curl_errno($chLocal)) {
-            IPS_LogMessage("Vestaboard", "Lokaler cURL Fehler: " . curl_error($chLocal));
+            IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardLocal: ' . "Lokaler cURL Fehler: " . curl_error($chLocal));
             curl_close($chLocal);
             return false;
         } else {
@@ -106,10 +106,10 @@ class VestaboardLocal extends IPSModuleStrict {
             curl_close($chLocal);
             
             if ($localHttpCode >= 200 && $localHttpCode < 300) {
-                IPS_LogMessage("Vestaboard", "Erfolgreich kompiliert und lokal gesendet.");
+                IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardLocal: ' . "Erfolgreich kompiliert und lokal gesendet.");
                 return true;
             } else {
-                IPS_LogMessage("Vestaboard", "Lokaler API Fehler! HTTP Code: " . $localHttpCode . " Response: " . $responseLocal);
+                IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardLocal: ' . "Lokaler API Fehler! HTTP Code: " . $localHttpCode . " Response: " . $responseLocal);
                 return false;
             }
         }
