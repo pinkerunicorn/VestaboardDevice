@@ -19,7 +19,7 @@
                         { "label": "Hoch", "value": "high" },
                         { "label": "Niedrig", "value": "low" }
                     ],
-                    "width": "100px",
+                    "width": "auto",
                     "add": "low",
                     "edit": {
                         "type": "Select",
@@ -48,7 +48,7 @@
                         { "label": "Fortschrittsbalken", "value": "wm" },
                         { "label": "Temperatur", "value": "aussen" }
                     ],
-                    "width": "200px",
+                    "width": "auto",
                     "add": "custom",
                     "edit": {
                         "type": "Select",
@@ -72,7 +72,7 @@
                     "name": "FormatString",
                     "caption": "Format / Prefix (für 'Benutzerdefiniert')",
                     "type": "ValidationTextBox",
-                    "width": "300px",
+                    "width": "auto",
                     "add": "",
                     "edit": { "type": "ValidationTextBox" }
                 }
@@ -139,3 +139,4 @@
         { "type": "Button", "label": "Board jetzt manuell aktualisieren", "onClick": "VESTA_UpdateBoard($id, true);" }
     ]
 }
+
