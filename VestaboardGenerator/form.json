@@ -14,6 +14,7 @@
                     "caption": "Prio",
                     "type": "Select",
                     "options": [
+                        { "label": "Sofort", "value": "immediate" },
                         { "label": "Hoch", "value": "high" },
                         { "label": "Niedrig", "value": "low" }
                     ],
@@ -22,6 +23,7 @@
                     "edit": {
                         "type": "Select",
                         "options": [
+                            { "label": "Sofort", "value": "immediate" },
                             { "label": "Hoch", "value": "high" },
                             { "label": "Niedrig", "value": "low" }
                         ]

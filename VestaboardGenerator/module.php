@@ -58,6 +58,24 @@ class VestaboardGenerator extends IPSModuleStrict {
             $this->UpdateBoard(true); // Manuelles Update erzwingen
             return;
         }
+        
+        $isImmediate = false;
+        $list = json_decode($this->ReadPropertyString("VariablesList"), true);
+        if (is_array($list)) {
+            foreach ($list as $row) {
+                if ($row['Active'] && $row['VariableID'] == $SenderID) {
+                    if (isset($row['Priority']) && $row['Priority'] === 'immediate') {
+                        $isImmediate = true;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        if ($isImmediate) {
+            $this->UpdateBoard();
+            return;
+        }
 
         // Wird aufgerufen, wenn sich eine der überwachten Variablen ändert
         $delayMin = $this->ReadPropertyInteger("UpdateDelayMinutes");
@@ -74,6 +92,7 @@ class VestaboardGenerator extends IPSModuleStrict {
     public function UpdateBoard(bool $force = false): void {
         $this->SetTimerInterval('VestaboardUpdateTimer', 0);
         
+        $linesImmediate = [];
         $linesHigh = [];
         $linesLow = [];
 
@@ -96,7 +115,9 @@ class VestaboardGenerator extends IPSModuleStrict {
             $cleanText = trim(preg_replace('/\{\d{1,2}\}/', '', $text));
 
             if ($cleanText !== "") {
-                if ($prio === 'high') {
+                if ($prio === 'immediate') {
+                    $linesImmediate[] = ["text" => $text, "clean" => $cleanText];
+                } elseif ($prio === 'high') {
                     $linesHigh[] = ["text" => $text, "clean" => $cleanText];
                 } else {
                     $linesLow[] = ["text" => $text, "clean" => $cleanText];
@@ -104,8 +125,8 @@ class VestaboardGenerator extends IPSModuleStrict {
             }
         }
 
-        // Alle 'Hoch' Prioritäten einfügen
-        $finalLines = $linesHigh;
+        // Alle 'Sofort' und 'Hoch' Prioritäten einfügen
+        $finalLines = array_merge($linesImmediate, $linesHigh);
 
         // Wenn noch Platz ist, fülle mit 'Niedrig' auf. 
         // Das Vestaboard hat genau 6 nutzbare Zeilen.
@@ -114,7 +135,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             $finalLines = array_merge($finalLines, array_slice($linesLow, 0, $remainingSpace));
         }
 
-        // Maximal 6 Zeilen extrahieren (falls es z.B. 7 High-Prios gibt)
+        // Maximal 6 Zeilen extrahieren
         $finalLines = array_slice($finalLines, 0, 6);
 
         // String zusammenbauen und Variablen updaten
