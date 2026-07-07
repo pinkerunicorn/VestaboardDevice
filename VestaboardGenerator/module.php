@@ -11,6 +11,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->RegisterPropertyInteger("InstIdVestaboardLocal", 0); // Die InstanzID vom Vestaboard Local Modul
         $this->RegisterPropertyInteger("ManualUpdateTriggerID", 0); // Trigger für manuelles Update
         $this->RegisterPropertyInteger("HeimkinoModeVariableID", 0); // Trigger für Heimkino-Modus
+        $this->RegisterPropertyInteger("HeimkinoModeValue", 3); // Die ID des Heimkino-Modus
         $this->RegisterPropertyInteger("ActiveTimeStart", 7);
         $this->RegisterPropertyInteger("ActiveTimeEnd", 22);
         $this->RegisterPropertyInteger("UpdateDelaySeconds", 60); // Muss für Abwärtskompatibilität bleiben
@@ -105,9 +106,14 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->SetTimerInterval('VestaboardUpdateTimer', 0);
         
         $heimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
-        if ($heimkinoId > 0 && IPS_VariableExists($heimkinoId) && GetValue($heimkinoId)) {
-            $this->UpdateBoardForHeimkino($force);
-            return;
+        $heimkinoVal = $this->ReadPropertyInteger("HeimkinoModeValue");
+        
+        if ($heimkinoId > 0 && IPS_VariableExists($heimkinoId)) {
+            $val = GetValue($heimkinoId);
+            if ((is_bool($val) && $val) || (is_int($val) && $val === $heimkinoVal)) {
+                $this->UpdateBoardForHeimkino($force);
+                return;
+            }
         }
         
         $linesImmediate = [];

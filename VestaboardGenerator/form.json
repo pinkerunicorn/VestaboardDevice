@@ -101,9 +101,20 @@
             "caption": "Heimkino-Modus"
         },
         {
-            "type": "SelectVariable",
-            "name": "HeimkinoModeVariableID",
-            "caption": "Aktivierungs-Variable für Heimkino-Modus"
+            "type": "RowLayout",
+            "items": [
+                {
+                    "type": "SelectVariable",
+                    "name": "HeimkinoModeVariableID",
+                    "caption": "Haus-Modus Variable (z.B. vom SmartHome Controller)"
+                },
+                {
+                    "type": "NumberSpinner",
+                    "name": "HeimkinoModeValue",
+                    "caption": "Modus ID (für Heimkino, z.B. 3)",
+                    "minimum": 0
+                }
+            ]
         },
         {
             "type": "Label",
