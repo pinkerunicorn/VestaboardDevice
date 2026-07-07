@@ -10,6 +10,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->RegisterPropertyString("VariablesList", "[]");
         $this->RegisterPropertyInteger("InstIdVestaboardLocal", 0); // Die InstanzID vom Vestaboard Local Modul
         $this->RegisterPropertyInteger("ManualUpdateTriggerID", 0); // Trigger für manuelles Update
+        $this->RegisterPropertyInteger("HeimkinoModeVariableID", 0); // Trigger für Heimkino-Modus
         $this->RegisterPropertyInteger("ActiveTimeStart", 7);
         $this->RegisterPropertyInteger("ActiveTimeEnd", 22);
         $this->RegisterPropertyInteger("UpdateDelaySeconds", 60); // Muss für Abwärtskompatibilität bleiben
@@ -49,6 +50,11 @@ class VestaboardGenerator extends IPSModuleStrict {
             $this->RegisterMessage($triggerId, VM_UPDATE);
         }
         
+        $heimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
+        if ($heimkinoId > 0 && IPS_VariableExists($heimkinoId)) {
+            $this->RegisterMessage($heimkinoId, VM_UPDATE);
+        }
+        
         $this->UpdateSleepTimer();
     }
 
@@ -56,6 +62,12 @@ class VestaboardGenerator extends IPSModuleStrict {
         $triggerId = $this->ReadPropertyInteger("ManualUpdateTriggerID");
         if ($triggerId > 0 && $SenderID == $triggerId) {
             $this->UpdateBoard(true); // Manuelles Update erzwingen
+            return;
+        }
+
+        $heimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
+        if ($heimkinoId > 0 && $SenderID == $heimkinoId) {
+            $this->UpdateBoard(true); // Heimkino-Status hat sich geändert, sofort updaten
             return;
         }
         
@@ -91,6 +103,12 @@ class VestaboardGenerator extends IPSModuleStrict {
 
     public function UpdateBoard(bool $force = false): void {
         $this->SetTimerInterval('VestaboardUpdateTimer', 0);
+        
+        $heimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
+        if ($heimkinoId > 0 && IPS_VariableExists($heimkinoId) && GetValue($heimkinoId)) {
+            $this->UpdateBoardForHeimkino($force);
+            return;
+        }
         
         $linesImmediate = [];
         $linesHigh = [];
@@ -180,6 +198,23 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
     }
 
+    private function UpdateBoardForHeimkino(bool $force): void {
+        $textBasis = "Heimkino Aktiv!";
+        
+        for ($i = 1; $i <= 6; $i++) {
+            if ($i == 1) {
+                $this->SetValue("Line1", $textBasis);
+            } else {
+                $this->SetValue("Line{$i}", "");
+            }
+        }
+        
+        $instId = $this->ReadPropertyInteger("InstIdVestaboardLocal");
+        if ($instId > 0 && IPS_InstanceExists($instId)) {
+            VESTA_SendMessage($instId, $this->PadToRight($textBasis, ""));
+        }
+    }
+
     private function GetLineText(string $type, int $id, string $format): string {
         $text = "";
         
@@ -195,14 +230,6 @@ class VestaboardGenerator extends IPSModuleStrict {
                 $isActive = (is_bool($val) && $val) || ((is_int($val) || is_float($val)) && $val > 0);
                 if ($isActive && $format != "") {
                     $text = $this->PadToRight($format, "");
-                }
-                break;
-            case 'heimkino':
-                $val = GetValue($id);
-                $isActive = (is_bool($val) && $val) || ((is_int($val) || is_float($val)) && $val > 0);
-                if ($isActive) {
-                    $outText = ($format != "") ? $format : "Heimkino Aktiv";
-                    $text = $this->PadToRight($outText, "");
                 }
                 break;
             case 'wm':
