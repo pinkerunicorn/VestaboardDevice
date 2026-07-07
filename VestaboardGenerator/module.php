@@ -197,6 +197,14 @@ class VestaboardGenerator extends IPSModuleStrict {
                     $text = $this->PadToRight($format, "");
                 }
                 break;
+            case 'heimkino':
+                $val = GetValue($id);
+                $isActive = (is_bool($val) && $val) || ((is_int($val) || is_float($val)) && $val > 0);
+                if ($isActive) {
+                    $outText = ($format != "") ? $format : "Heimkino Aktiv";
+                    $text = $this->PadToRight($outText, "");
+                }
+                break;
             case 'wm':
             case 'tr':
                 $prozent = max(0, min(100, (int)GetValue($id)));
