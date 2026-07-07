@@ -19,7 +19,7 @@
                         { "label": "Hoch", "value": "high" },
                         { "label": "Niedrig", "value": "low" }
                     ],
-                    "width": "auto",
+                    "width": "100px",
                     "add": "low",
                     "edit": {
                         "type": "Select",
@@ -49,7 +49,7 @@
                         { "label": "Temperatur", "value": "aussen" },
                         { "label": "Heimkino", "value": "heimkino" }
                     ],
-                    "width": "auto",
+                    "width": "200px",
                     "add": "custom",
                     "edit": {
                         "type": "Select",
@@ -74,7 +74,7 @@
                     "name": "FormatString",
                     "caption": "Format / Prefix (für 'Benutzerdefiniert')",
                     "type": "ValidationTextBox",
-                    "width": "auto",
+                    "width": "250px",
                     "add": "",
                     "edit": { "type": "ValidationTextBox" }
                 }
