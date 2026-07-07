@@ -8,6 +8,7 @@
             "rowCount": 15,
             "add": true,
             "delete": true,
+            "changeOrder": true,
             "columns": [
                 {
                     "name": "Priority",
