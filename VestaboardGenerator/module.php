@@ -282,7 +282,11 @@ class VestaboardGenerator extends IPSModuleStrict {
                 if (is_bool($val)) {
                     $val = $val ? 'Ein' : 'Aus';
                 } else {
-                    $val = (string)$val;
+                    $val = trim((string)$val);
+                }
+                
+                if ($val === "") {
+                    return "";
                 }
                 
                 if ($format != "") {
