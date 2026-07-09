@@ -12,6 +12,8 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->RegisterPropertyInteger("ManualUpdateTriggerID", 0); // Trigger für manuelles Update
         $this->RegisterPropertyInteger("HeimkinoModeVariableID", 0); // Trigger für Heimkino-Modus
         $this->RegisterPropertyInteger("HeimkinoModeValue", 3); // Die ID des Heimkino-Modus
+        $this->RegisterPropertyInteger("AbsenceModeVariableID", 0);
+        $this->RegisterPropertyInteger("AbsenceModeValue", 1);
         $this->RegisterPropertyInteger("ActiveTimeStart", 7);
         $this->RegisterPropertyInteger("ActiveTimeEnd", 22);
         $this->RegisterPropertyInteger("UpdateDelaySeconds", 60); // Muss für Abwärtskompatibilität bleiben
@@ -56,6 +58,11 @@ class VestaboardGenerator extends IPSModuleStrict {
             $this->RegisterMessage($heimkinoId, VM_UPDATE);
         }
         
+        $absenceId = $this->ReadPropertyInteger("AbsenceModeVariableID");
+        if ($absenceId > 0 && IPS_VariableExists($absenceId)) {
+            $this->RegisterMessage($absenceId, VM_UPDATE);
+        }
+        
         $this->UpdateSleepTimer();
     }
 
@@ -66,9 +73,24 @@ class VestaboardGenerator extends IPSModuleStrict {
             return;
         }
 
+        $absenceId = $this->ReadPropertyInteger("AbsenceModeVariableID");
+        if ($absenceId > 0 && $SenderID == $absenceId) {
+            $absenceVal = $this->ReadPropertyInteger("AbsenceModeValue");
+            $val = GetValue($absenceId);
+            $isAbsent = ((is_bool($val) && $val) || (is_int($val) && $val === $absenceVal));
+            if (!$isAbsent) {
+                $this->UpdateBoard(true); // force update when returning home
+            }
+            return;
+        }
+
         $heimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
         if ($heimkinoId > 0 && $SenderID == $heimkinoId) {
-            $this->UpdateBoard(true); // Heimkino-Status hat sich geändert, sofort updaten
+            $heimkinoVal = $this->ReadPropertyInteger("HeimkinoModeValue");
+            $val = GetValue($heimkinoId);
+            $isHeimkinoActive = ((is_bool($val) && $val) || (is_int($val) && $val === $heimkinoVal));
+            
+            $this->UpdateBoard($isHeimkinoActive, !$isHeimkinoActive); // Heimkino-Status hat sich geändert, sofort updaten
             return;
         }
         
@@ -102,7 +124,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
     }
 
-    public function UpdateBoard(bool $force = false): void {
+    public function UpdateBoard(bool $force = false, bool $isHeimkinoTurningOff = false): void {
         $this->SetTimerInterval('VestaboardUpdateTimer', 0);
         
         $heimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
@@ -192,12 +214,29 @@ class VestaboardGenerator extends IPSModuleStrict {
             }
         }
 
+        $isAbsent = false;
+        $absenceId = $this->ReadPropertyInteger("AbsenceModeVariableID");
+        $absenceVal = $this->ReadPropertyInteger("AbsenceModeValue");
+        if ($absenceId > 0 && IPS_VariableExists($absenceId)) {
+            $val = GetValue($absenceId);
+            if ((is_bool($val) && $val) || (is_int($val) && $val === $absenceVal)) {
+                $isAbsent = true;
+            }
+        }
+
         if ($instId > 0 && IPS_InstanceExists($instId)) {
-            if ($isActiveTime || $force) {
+            if ($isAbsent) {
+                IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: Aktualisierung uebersprungen (Haus im Abwesenheitsmodus)');
+            } elseif ($isActiveTime || $force) {
                 // Direkt die Funktion der Vestaboard Local Instanz aufrufen
                 VESTA_SendMessage($instId, $textBasis);
             } else {
-                IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . "Aktualisierung uebersprungen (Ruhezeit aktiv: " . $currentHour . " Uhr)");
+                $sleepText = $this->ReadPropertyString("SleepText");
+                if ($isHeimkinoTurningOff && $sleepText !== "") {
+                    VESTA_SendMessage($instId, $sleepText);
+                } else {
+                    IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . "Aktualisierung uebersprungen (Ruhezeit aktiv: " . $currentHour . " Uhr)");
+                }
             }
         } else {
             IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . "Keine gueltige Vestaboard Local Instanz hinterlegt.");
@@ -376,7 +415,17 @@ class VestaboardGenerator extends IPSModuleStrict {
         $sleepText = $this->ReadPropertyString("SleepText");
         $instId = $this->ReadPropertyInteger("InstIdVestaboardLocal");
 
-        if ($sleepText !== "" && $instId > 0 && IPS_InstanceExists($instId)) {
+        $isAbsent = false;
+        $absenceId = $this->ReadPropertyInteger("AbsenceModeVariableID");
+        $absenceVal = $this->ReadPropertyInteger("AbsenceModeValue");
+        if ($absenceId > 0 && IPS_VariableExists($absenceId)) {
+            $val = GetValue($absenceId);
+            if ((is_bool($val) && $val) || (is_int($val) && $val === $absenceVal)) {
+                $isAbsent = true;
+            }
+        }
+
+        if ($sleepText !== "" && $instId > 0 && IPS_InstanceExists($instId) && !$isAbsent) {
             VESTA_SendMessage($instId, $sleepText);
         }
         
