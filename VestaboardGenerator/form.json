@@ -98,41 +98,30 @@
         },
         {
             "type": "Label",
+            "caption": "Haus-Modus"
+        },
+        {
+            "type": "SelectVariable",
+            "name": "HouseModeVariableID",
+            "caption": "Haus-Modus Variable (z.B. vom SmartHome Controller)"
+        },
+        {
+            "type": "Label",
             "caption": "Heimkino-Modus"
         },
         {
-            "type": "RowLayout",
-            "items": [
-                {
-                    "type": "SelectVariable",
-                    "name": "HeimkinoModeVariableID",
-                    "caption": "Haus-Modus Variable (z.B. vom SmartHome Controller)"
-                },
-                {
-                    "type": "ValidationTextBox",
-                    "name": "HeimkinoModeValues",
-                    "caption": "Modus IDs (für Heimkino, z.B. 3 oder 3,4)"
-                }
-            ]
+            "type": "ValidationTextBox",
+            "name": "HeimkinoModeValues",
+            "caption": "Modus IDs (für Heimkino, z.B. 3 oder 3,4)"
         },
         {
             "type": "Label",
             "caption": "Abwesenheits-Modus"
         },
         {
-            "type": "RowLayout",
-            "items": [
-                {
-                    "type": "SelectVariable",
-                    "name": "AbsenceModeVariableID",
-                    "caption": "Haus-Modus Variable (z.B. vom SmartHome Controller)"
-                },
-                {
-                    "type": "ValidationTextBox",
-                    "name": "AbsenceModeValues",
-                    "caption": "Modus IDs (für Abwesend, z.B. 1 oder 1,2)"
-                }
-            ]
+            "type": "ValidationTextBox",
+            "name": "AbsenceModeValues",
+            "caption": "Modus IDs (für Abwesend, z.B. 1 oder 1,2)"
         },
         {
             "type": "Label",

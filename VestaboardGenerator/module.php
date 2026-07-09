@@ -10,9 +10,10 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->RegisterPropertyString("VariablesList", "[]");
         $this->RegisterPropertyInteger("InstIdVestaboardLocal", 0); // Die InstanzID vom Vestaboard Local Modul
         $this->RegisterPropertyInteger("ManualUpdateTriggerID", 0); // Trigger für manuelles Update
-        $this->RegisterPropertyInteger("HeimkinoModeVariableID", 0); // Trigger für Heimkino-Modus
+        $this->RegisterPropertyInteger("HouseModeVariableID", 0); // Globale Haus-Modus Variable
+        $this->RegisterPropertyInteger("HeimkinoModeVariableID", 0); // Veraltet
         $this->RegisterPropertyString("HeimkinoModeValues", "3"); // Die IDs des Heimkino-Modus (kommagetrennt)
-        $this->RegisterPropertyInteger("AbsenceModeVariableID", 0);
+        $this->RegisterPropertyInteger("AbsenceModeVariableID", 0); // Veraltet
         $this->RegisterPropertyString("AbsenceModeValues", "1");
         $this->RegisterPropertyInteger("ActiveTimeStart", 7);
         $this->RegisterPropertyInteger("ActiveTimeEnd", 22);
@@ -53,14 +54,30 @@ class VestaboardGenerator extends IPSModuleStrict {
             $this->RegisterMessage($triggerId, VM_UPDATE);
         }
         
-        $heimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
-        if ($heimkinoId > 0 && IPS_VariableExists($heimkinoId)) {
-            $this->RegisterMessage($heimkinoId, VM_UPDATE);
+        // Migration zu HouseModeVariableID
+        $houseModeId = $this->ReadPropertyInteger("HouseModeVariableID");
+        if ($houseModeId == 0) {
+            $oldAbsenceId = $this->ReadPropertyInteger("AbsenceModeVariableID");
+            $oldHeimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
+            
+            $newId = 0;
+            if ($oldAbsenceId > 0) {
+                $newId = $oldAbsenceId;
+            } elseif ($oldHeimkinoId > 0) {
+                $newId = $oldHeimkinoId;
+            }
+            
+            if ($newId > 0) {
+                IPS_SetProperty($this->InstanceID, "HouseModeVariableID", $newId);
+                IPS_SetProperty($this->InstanceID, "AbsenceModeVariableID", 0);
+                IPS_SetProperty($this->InstanceID, "HeimkinoModeVariableID", 0);
+                IPS_ApplyChanges($this->InstanceID);
+                return;
+            }
         }
         
-        $absenceId = $this->ReadPropertyInteger("AbsenceModeVariableID");
-        if ($absenceId > 0 && IPS_VariableExists($absenceId)) {
-            $this->RegisterMessage($absenceId, VM_UPDATE);
+        if ($houseModeId > 0 && IPS_VariableExists($houseModeId)) {
+            $this->RegisterMessage($houseModeId, VM_UPDATE);
         }
         
         $this->UpdateSleepTimer();
@@ -73,24 +90,19 @@ class VestaboardGenerator extends IPSModuleStrict {
             return;
         }
 
-        $absenceId = $this->ReadPropertyInteger("AbsenceModeVariableID");
-        if ($absenceId > 0 && $SenderID == $absenceId) {
+        $houseModeId = $this->ReadPropertyInteger("HouseModeVariableID");
+        if ($houseModeId > 0 && $SenderID == $houseModeId) {
+            $val = GetValue($houseModeId);
+            
             $absenceVals = array_map('intval', array_map('trim', explode(',', $this->ReadPropertyString("AbsenceModeValues"))));
-            $val = GetValue($absenceId);
             $isAbsent = ((is_bool($val) && $val) || (is_int($val) && in_array($val, $absenceVals, true)));
-            if (!$isAbsent) {
-                $this->UpdateBoard(true); // force update when returning home
-            }
-            return;
-        }
-
-        $heimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
-        if ($heimkinoId > 0 && $SenderID == $heimkinoId) {
+            
             $heimkinoVals = array_map('intval', array_map('trim', explode(',', $this->ReadPropertyString("HeimkinoModeValues"))));
-            $val = GetValue($heimkinoId);
             $isHeimkinoActive = ((is_bool($val) && $val) || (is_int($val) && in_array($val, $heimkinoVals, true)));
             
-            $this->UpdateBoard($isHeimkinoActive, !$isHeimkinoActive); // Heimkino-Status hat sich geändert, sofort updaten
+            $forceUpdate = (!$isAbsent || $isHeimkinoActive);
+            
+            $this->UpdateBoard($forceUpdate, !$isHeimkinoActive);
             return;
         }
         
@@ -127,11 +139,11 @@ class VestaboardGenerator extends IPSModuleStrict {
     public function UpdateBoard(bool $force = false, bool $isHeimkinoTurningOff = false): void {
         $this->SetTimerInterval('VestaboardUpdateTimer', 0);
         
-        $heimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
+        $houseModeId = $this->ReadPropertyInteger("HouseModeVariableID");
         
-        if ($heimkinoId > 0 && IPS_VariableExists($heimkinoId)) {
+        if ($houseModeId > 0 && IPS_VariableExists($houseModeId)) {
             $heimkinoVals = array_map('intval', array_map('trim', explode(',', $this->ReadPropertyString("HeimkinoModeValues"))));
-            $val = GetValue($heimkinoId);
+            $val = GetValue($houseModeId);
             if ((is_bool($val) && $val) || (is_int($val) && in_array($val, $heimkinoVals, true))) {
                 $this->UpdateBoardForHeimkino($force);
                 return;
@@ -416,10 +428,10 @@ class VestaboardGenerator extends IPSModuleStrict {
         $instId = $this->ReadPropertyInteger("InstIdVestaboardLocal");
 
         $isAbsent = false;
-        $absenceId = $this->ReadPropertyInteger("AbsenceModeVariableID");
-        if ($absenceId > 0 && IPS_VariableExists($absenceId)) {
+        $houseModeId = $this->ReadPropertyInteger("HouseModeVariableID");
+        if ($houseModeId > 0 && IPS_VariableExists($houseModeId)) {
             $absenceVals = array_map('intval', array_map('trim', explode(',', $this->ReadPropertyString("AbsenceModeValues"))));
-            $val = GetValue($absenceId);
+            $val = GetValue($houseModeId);
             if ((is_bool($val) && $val) || (is_int($val) && in_array($val, $absenceVals, true))) {
                 $isAbsent = true;
             }
