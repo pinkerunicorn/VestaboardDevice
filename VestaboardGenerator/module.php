@@ -21,7 +21,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->RegisterPropertyInteger("UpdateDelayMinutes", 1);
         $this->RegisterPropertyString("SleepText", "");
 
-        $this->RegisterTimer("VestaboardUpdateTimer", 0, 'VESTA_UpdateBoard($_IPS[\'TARGET\'], false, false);');
+        $this->RegisterTimer("VestaboardUpdateTimer", 0, 'VESTA_UpdateBoard($_IPS[\'TARGET\'], false);');
         $this->RegisterTimer("VestaboardSleepTimer", 0, 'VESTA_SendSleepText($_IPS[\'TARGET\']);');
         $this->RegisterTimer("VestaboardWakeupTimer", 0, 'VESTA_Wakeup($_IPS[\'TARGET\']);');
 
@@ -88,7 +88,7 @@ class VestaboardGenerator extends IPSModuleStrict {
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void {
         $triggerId = $this->ReadPropertyInteger("ManualUpdateTriggerID");
         if ($triggerId > 0 && $SenderID == $triggerId) {
-            $this->UpdateBoard(true); // Manuelles Update erzwingen
+            $this->DoUpdateBoard(true); // Manuelles Update erzwingen
             return;
         }
 
@@ -104,7 +104,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             
             $forceUpdate = (!$isAbsent || $isHeimkinoActive);
             
-            $this->UpdateBoard($forceUpdate, !$isHeimkinoActive);
+            $this->DoUpdateBoard($forceUpdate, !$isHeimkinoActive);
             return;
         }
         
@@ -122,7 +122,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
         
         if ($isImmediate) {
-            $this->UpdateBoard();
+            $this->DoUpdateBoard();
             return;
         }
 
@@ -134,11 +134,15 @@ class VestaboardGenerator extends IPSModuleStrict {
                 $this->SetTimerInterval('VestaboardUpdateTimer', $delaySec * 1000);
             }
         } else {
-            $this->UpdateBoard();
+            $this->DoUpdateBoard();
         }
     }
 
-    public function UpdateBoard(bool $force = false, bool $isHeimkinoTurningOff = false): void {
+    public function UpdateBoard(bool $force = false): void {
+        $this->DoUpdateBoard($force, false);
+    }
+
+    private function DoUpdateBoard(bool $force = false, bool $isHeimkinoTurningOff = false): void {
         $this->SetTimerInterval('VestaboardUpdateTimer', 0);
         
         $houseModeId = $this->ReadPropertyInteger("HouseModeVariableID");
@@ -469,7 +473,7 @@ class VestaboardGenerator extends IPSModuleStrict {
     }
 
     public function Wakeup(): void {
-        $this->UpdateBoard(true);
+        $this->DoUpdateBoard(true);
         $this->UpdateWakeupTimer();
     }
 
