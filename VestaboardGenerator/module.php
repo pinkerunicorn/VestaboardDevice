@@ -23,6 +23,7 @@ class VestaboardGenerator extends IPSModuleStrict {
 
         $this->RegisterTimer("VestaboardUpdateTimer", 0, 'VESTA_UpdateBoard($_IPS[\'TARGET\'], false);');
         $this->RegisterTimer("VestaboardSleepTimer", 0, 'VESTA_SendSleepText($_IPS[\'TARGET\']);');
+        $this->RegisterTimer("VestaboardWakeupTimer", 0, 'VESTA_Wakeup($_IPS[\'TARGET\']);');
 
         for ($i = 1; $i <= 6; $i++) {
             $this->RegisterVariableString("Line{$i}", "Zeile {$i}", "", $i);
@@ -81,6 +82,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
         
         $this->UpdateSleepTimer();
+        $this->UpdateWakeupTimer();
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void {
@@ -464,6 +466,25 @@ class VestaboardGenerator extends IPSModuleStrict {
 
         $interval = ($targetTime - $now) * 1000;
         $this->SetTimerInterval("VestaboardSleepTimer", $interval);
+    }
+
+    public function Wakeup(): void {
+        $this->UpdateBoard(true);
+        $this->UpdateWakeupTimer();
+    }
+
+    private function UpdateWakeupTimer(): void {
+        $activeStart = $this->ReadPropertyInteger("ActiveTimeStart");
+
+        $now = time();
+        $targetTime = mktime($activeStart, 0, 0, (int)date('m'), (int)date('d'), (int)date('Y'));
+
+        if ($targetTime <= $now) {
+            $targetTime = strtotime('+1 day', $targetTime);
+        }
+
+        $interval = ($targetTime - $now) * 1000;
+        $this->SetTimerInterval("VestaboardWakeupTimer", $interval);
     }
 }
 ?>
