@@ -115,10 +115,9 @@ class VestaboardLocal extends IPSModuleStrict {
         }
     }
 
-    protected function LogMessage(string $Message, int $Type): bool
+    protected function LogMessage($Message, $Type)
     {
         IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardLocal: ' . $Message);
-        return true;
     }
 }
 
