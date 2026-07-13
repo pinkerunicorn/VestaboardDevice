@@ -523,8 +523,9 @@ class VestaboardGenerator extends IPSModuleStrict {
 {
     "elements": [
         {
-            "type": "Label",
-            "label": "Variablen-Zuordnung für das Vestaboard"
+            "type": "ExpansionPanel",
+            "caption": "⚙️ ",
+            "items": []
         },
         {
             "type": "List",

@@ -131,9 +131,14 @@ class VestaboardLocal extends IPSModuleStrict {
             "label": "Verbindungseinstellungen"
         },
         {
-            "type": "ValidationTextBox",
-            "name": "ApiUrl",
-            "caption": "Vestaboard Local API URL"
+            "type": "RowLayout",
+            "items": [
+                {
+                    "type": "ValidationTextBox",
+                    "name": "ApiUrl",
+                    "caption": "Vestaboard Local API URL"
+                }
+            ]
         },
         {
             "type": "PasswordTextBox",
