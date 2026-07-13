@@ -271,6 +271,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             } else {
                 $sleepText = $this->ReadPropertyString("SleepText");
                 if ($isHeimkinoTurningOff && $sleepText !== "") {
+                    $sleepText = $this->SanitizeTextForVestaboard($sleepText);
                     VESTA_SendMessage($instId, $sleepText);
                 } else {
                     IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . "Aktualisierung uebersprungen (Ruhezeit aktiv: " . $currentHour . " Uhr)");
@@ -464,6 +465,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
 
         if ($sleepText !== "" && $instId > 0 && IPS_InstanceExists($instId) && !$isAbsent) {
+            $sleepText = $this->SanitizeTextForVestaboard($sleepText);
             VESTA_SendMessage($instId, $sleepText);
         }
         
@@ -488,7 +490,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             $targetTime = strtotime('+1 day', $targetTime);
         }
 
-        $interval = ($targetTime - $now) * 1000;
+        $interval = (int)(($targetTime - $now) * 1000);
         $this->SetTimerInterval("VestaboardSleepTimer", $interval);
     }
 
@@ -507,7 +509,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             $targetTime = strtotime('+1 day', $targetTime);
         }
 
-        $interval = ($targetTime - $now) * 1000;
+        $interval = (int)(($targetTime - $now) * 1000);
         $this->SetTimerInterval("VestaboardWakeupTimer", $interval);
     }
 
