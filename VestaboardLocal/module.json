@@ -3,10 +3,13 @@
     "name": "Vestaboard Local",
     "type": 3,
     "vendor": "Vestaboard",
-    "url": "https://github.com/pinkerunicorn/VestaboardDevice",
-    "aliases": ["Vestaboard Local"],
+    "url": "https://github.com/pinkerunicorn/",
+    "aliases": [
+        "Vestaboard Local"
+    ],
     "parentRequirements": [],
     "childRequirements": [],
     "implemented": [],
-    "prefix": "VESTA"
+    "prefix": "VESTA",
+    "author": "Florian Graßinger"
 }
