@@ -263,6 +263,201 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
 
         if ($instId > 0 && IPS_InstanceExists($instId)) {
+        }
+        
+        $triggerId = $this->ReadPropertyInteger("ManualUpdateTriggerID");
+        if ($triggerId > 0 && IPS_VariableExists($triggerId)) {
+            $this->RegisterMessage($triggerId, VM_UPDATE);
+        }
+        
+        // Migration zu HouseModeVariableID
+        $houseModeId = $this->ReadPropertyInteger("HouseModeVariableID");
+        if ($houseModeId == 0) {
+            $oldAbsenceId = $this->ReadPropertyInteger("AbsenceModeVariableID");
+            $oldHeimkinoId = $this->ReadPropertyInteger("HeimkinoModeVariableID");
+            
+            $newId = 0;
+            if ($oldAbsenceId > 0) {
+                $newId = $oldAbsenceId;
+            } elseif ($oldHeimkinoId > 0) {
+                $newId = $oldHeimkinoId;
+            }
+            
+            if ($newId > 0) {
+                IPS_SetProperty($this->InstanceID, "HouseModeVariableID", $newId);
+                IPS_SetProperty($this->InstanceID, "AbsenceModeVariableID", 0);
+                IPS_SetProperty($this->InstanceID, "HeimkinoModeVariableID", 0);
+                IPS_ApplyChanges($this->InstanceID);
+                return;
+            }
+        }
+        
+        if ($houseModeId > 0 && IPS_VariableExists($houseModeId)) {
+            $this->RegisterMessage($houseModeId, VM_UPDATE);
+        }
+        
+        $this->UpdateSleepTimer();
+        $this->UpdateWakeupTimer();
+    }
+
+    public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void {
+        $triggerId = $this->ReadPropertyInteger("ManualUpdateTriggerID");
+        if ($triggerId > 0 && $SenderID == $triggerId) {
+            $this->DoUpdateBoard(true); // Manuelles Update erzwingen
+            return;
+        }
+
+        $houseModeId = $this->ReadPropertyInteger("HouseModeVariableID");
+        if ($houseModeId > 0 && $SenderID == $houseModeId) {
+            $val = GetValue($houseModeId);
+            
+            $absenceVals = array_map('intval', array_map('trim', explode(',', $this->ReadPropertyString("AbsenceModeValues"))));
+            $isAbsent = ((is_bool($val) && $val) || (is_int($val) && in_array($val, $absenceVals, true)));
+            
+            $heimkinoVals = array_map('intval', array_map('trim', explode(',', $this->ReadPropertyString("HeimkinoModeValues"))));
+            $isHeimkinoActive = ((is_bool($val) && $val) || (is_int($val) && in_array($val, $heimkinoVals, true)));
+            
+            $forceUpdate = (!$isAbsent || $isHeimkinoActive);
+            
+            $this->DoUpdateBoard($forceUpdate, !$isHeimkinoActive);
+            return;
+        }
+        
+        $isImmediate = false;
+        $list = json_decode($this->ReadPropertyString("VariablesList"), true);
+        if (is_array($list)) {
+            foreach ($list as $row) {
+                if ($row['Active'] && $row['VariableID'] == $SenderID) {
+                    if (isset($row['Priority']) && $row['Priority'] === 'immediate') {
+                        $isImmediate = true;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        if ($isImmediate) {
+            $this->DoUpdateBoard();
+            return;
+        }
+
+        // Wird aufgerufen, wenn sich eine der überwachten Variablen ändert
+        $delayMin = $this->ReadPropertyInteger("UpdateDelayMinutes");
+        $delaySec = $delayMin * 60;
+        if ($delaySec > 0) {
+            if ($this->GetTimerInterval('VestaboardUpdateTimer') == 0) {
+                $this->SetTimerInterval('VestaboardUpdateTimer', $delaySec * 1000);
+            }
+        } else {
+            $this->DoUpdateBoard();
+        }
+    }
+
+    public function UpdateBoard(bool $force = false): void {
+        $this->DoUpdateBoard($force, false);
+    }
+
+    private function DoUpdateBoard(bool $force = false, bool $isHeimkinoTurningOff = false): void {
+        $this->SetTimerInterval('VestaboardUpdateTimer', 0);
+        
+        $houseModeId = $this->ReadPropertyInteger("HouseModeVariableID");
+        
+        if ($houseModeId > 0 && IPS_VariableExists($houseModeId)) {
+            $heimkinoVals = array_map('intval', array_map('trim', explode(',', $this->ReadPropertyString("HeimkinoModeValues"))));
+            $val = GetValue($houseModeId);
+            if ((is_bool($val) && $val) || (is_int($val) && in_array($val, $heimkinoVals, true))) {
+                $this->UpdateBoardForHeimkino($force);
+                return;
+            }
+        }
+        
+        $linesImmediate = [];
+        $linesHigh = [];
+        $linesLow = [];
+
+        $list = json_decode($this->ReadPropertyString("VariablesList"), true);
+        if (!is_array($list)) {
+            $list = [];
+        }
+
+        foreach ($list as $row) {
+            if (!$row['Active'] || $row['VariableID'] == 0) {
+                continue;
+            }
+            
+            $id = $row['VariableID'];
+            $type = $row['Type'];
+            $prio = isset($row['Priority']) ? $row['Priority'] : 'low';
+            $format = isset($row['FormatString']) ? $row['FormatString'] : '';
+            
+            $text = $this->GetLineText($type, $id, $format);
+            $cleanText = trim(preg_replace('/\{\d{1,2}\}/', '', $text));
+
+            if ($cleanText !== "") {
+                if ($prio === 'immediate') {
+                    $linesImmediate[] = ["text" => $text, "clean" => $cleanText];
+                } elseif ($prio === 'high') {
+                    $linesHigh[] = ["text" => $text, "clean" => $cleanText];
+                } else {
+                    $linesLow[] = ["text" => $text, "clean" => $cleanText];
+                }
+            }
+        }
+
+        // Alle 'Sofort' und 'Hoch' Prioritäten einfügen
+        $finalLines = array_merge($linesImmediate, $linesHigh);
+
+        // Wenn noch Platz ist, fülle mit 'Niedrig' auf. 
+        // Das Vestaboard hat genau 6 nutzbare Zeilen.
+        $remainingSpace = 6 - count($finalLines);
+        if ($remainingSpace > 0) {
+            $finalLines = array_merge($finalLines, array_slice($linesLow, 0, $remainingSpace));
+        }
+
+        // Maximal 6 Zeilen extrahieren
+        $finalLines = array_slice($finalLines, 0, 6);
+
+        // String zusammenbauen und Variablen updaten
+        $textBasis = "";
+        for ($i = 0; $i < 6; $i++) {
+            if (isset($finalLines[$i])) {
+                $textBasis .= $finalLines[$i]['text'] . "\n";
+                $this->SetValue("Line" . ($i + 1), $finalLines[$i]['clean']);
+            } else {
+                $this->SetValue("Line" . ($i + 1), "");
+            }
+        }
+        $textBasis = rtrim($textBasis, "\n"); // Letzten Zeilenumbruch entfernen
+        
+        $instId = $this->ReadPropertyInteger("InstIdVestaboardLocal");
+        $activeStart = $this->ReadPropertyInteger("ActiveTimeStart");
+        $activeEnd = $this->ReadPropertyInteger("ActiveTimeEnd");
+        $currentHour = (int)date('G');
+
+        $isActiveTime = true;
+        if ($activeStart != $activeEnd) {
+            if ($activeStart < $activeEnd) {
+                if ($currentHour < $activeStart || $currentHour >= $activeEnd) {
+                    $isActiveTime = false;
+                }
+            } else {
+                if ($currentHour >= $activeEnd && $currentHour < $activeStart) {
+                    $isActiveTime = false;
+                }
+            }
+        }
+
+        $isAbsent = false;
+        $absenceId = $this->ReadPropertyInteger("AbsenceModeVariableID");
+        if ($absenceId > 0 && IPS_VariableExists($absenceId)) {
+            $absenceVals = array_map('intval', array_map('trim', explode(',', $this->ReadPropertyString("AbsenceModeValues"))));
+            $val = GetValue($absenceId);
+            if ((is_bool($val) && $val) || (is_int($val) && in_array($val, $absenceVals, true))) {
+                $isAbsent = true;
+            }
+        }
+
+        if ($instId > 0 && IPS_InstanceExists($instId)) {
             if ($isAbsent) {
                 IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: Aktualisierung uebersprungen (Haus im Abwesenheitsmodus)');
             } elseif ($isActiveTime || $force) {
@@ -271,6 +466,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             } else {
                 $sleepText = $this->ReadPropertyString("SleepText");
                 if ($isHeimkinoTurningOff && $sleepText !== "") {
+                    $sleepText = $this->SanitizeTextForVestaboard($sleepText);
                     VESTA_SendMessage($instId, $sleepText);
                 } else {
                     IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . "Aktualisierung uebersprungen (Ruhezeit aktiv: " . $currentHour . " Uhr)");
@@ -464,6 +660,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
 
         if ($sleepText !== "" && $instId > 0 && IPS_InstanceExists($instId) && !$isAbsent) {
+            $sleepText = $this->SanitizeTextForVestaboard($sleepText);
             VESTA_SendMessage($instId, $sleepText);
         }
         
@@ -488,7 +685,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             $targetTime = strtotime('+1 day', $targetTime);
         }
 
-        $interval = ($targetTime - $now) * 1000;
+        $interval = (int)(($targetTime - $now) * 1000);
         $this->SetTimerInterval("VestaboardSleepTimer", $interval);
     }
 
@@ -507,7 +704,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             $targetTime = strtotime('+1 day', $targetTime);
         }
 
-        $interval = ($targetTime - $now) * 1000;
+        $interval = (int)(($targetTime - $now) * 1000);
         $this->SetTimerInterval("VestaboardWakeupTimer", $interval);
     }
 
