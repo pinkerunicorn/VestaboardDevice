@@ -491,9 +491,10 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->SetTimerInterval("VestaboardWakeupTimer", $interval);
     }
 
-    protected function LogMessage($Message, $KL_MESSAGE = KL_MESSAGE)
+    protected function LogMessage(string $Message, int $Type): bool
     {
         IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . $Message);
+        return true;
     }
 }
 
