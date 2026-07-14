@@ -359,39 +359,73 @@ class VestaboardGenerator extends IPSModuleStrict {
                 $val = GetValue($id);
                 $days = -1;
                 $isActive = false;
+                $isStringVal = false;
 
                 if (is_bool($val)) {
                     $isActive = $val;
                     $days = 0; // Heute
                 } else if (is_int($val) || is_float($val)) {
+                    // Profile value? Wenn die Variable ein Profil hat, liefert IPSymcon evtl einen int.
+                    // Falls es sich um "Tage" handelt:
                     $days = (int)$val;
                     if ($days <= 2) { 
                         $isActive = true;
+                    }
+                } else if (is_string($val)) {
+                    $val = trim($val);
+                    if ($val !== "") {
+                        $isActive = true;
+                        $isStringVal = true;
                     }
                 }
 
                 if ($isActive) {
                     $color = "{65}"; // Standard Gelb
-                    $prefix = "Müll";
+                    
+                    if ($isStringVal) {
+                        $prefix = (string)$val;
+                        // Automatische Farberkennung anhand des Namens
+                        if (stripos($prefix, 'bio') !== false) {
+                            $color = "{66}"; // Grün
+                        } else if (stripos($prefix, 'papier') !== false) {
+                            $color = "{67}"; // Blau
+                        } else if (stripos($prefix, 'rest') !== false) {
+                            $color = "{70}"; // Schwarz
+                        } else if (stripos($prefix, 'gelb') !== false) {
+                            $color = "{65}"; // Gelb
+                        }
+                    } else {
+                        $prefix = "Müll";
+                    }
+
+                    // Format überschreibt Farbe oder hängt was an
                     if ($format != "") {
                         if (preg_match('/\{\d{1,2}\}/', $format, $matches)) {
                             $color = $matches[0];
-                            $prefix = trim(str_replace($color, "", $format));
-                        } else {
-                            $prefix = $format;
+                            $format = trim(str_replace($color, "", $format));
+                        }
+                        if ($format != "") {
+                            if ($isStringVal) {
+                                // "Morgen: Bio"
+                                $prefix = $format . " " . $prefix;
+                            } else {
+                                $prefix = $format;
+                            }
                         }
                     }
 
                     $suffix = "";
-                    if ($days === 0) {
-                        $suffix = " Heute!";
-                    } else if ($days === 1) {
-                        $suffix = " Morgen";
-                    } else if ($days === 2) {
-                        $suffix = " in 2 Tagen";
+                    if (!$isStringVal) {
+                        if ($days === 0) {
+                            $suffix = " Heute!";
+                        } else if ($days === 1) {
+                            $suffix = " Morgen";
+                        } else if ($days === 2) {
+                            $suffix = " in 2 Tagen";
+                        }
                     }
 
-                    $text = $this->PadToRight($prefix . $suffix, $color);
+                    $text = $this->PadToRight(trim($prefix . $suffix), $color);
                 }
                 break;
             case 'custom':
