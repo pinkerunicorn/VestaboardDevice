@@ -200,19 +200,19 @@ class VestaboardGenerator extends IPSModuleStrict {
 
             if ($cleanText !== "") {
                 if ($prio === 'immediate') {
-                    $linesImmediate[] = ["text" => $text, "clean" => $cleanText];
+                    $linesImmediate[] = ["text"=> $text, "clean"=> $cleanText];
                 } elseif ($prio === 'high') {
-                    $linesHigh[] = ["text" => $text, "clean" => $cleanText];
+                    $linesHigh[] = ["text"=> $text, "clean"=> $cleanText];
                 } else {
-                    $linesLow[] = ["text" => $text, "clean" => $cleanText];
+                    $linesLow[] = ["text"=> $text, "clean"=> $cleanText];
                 }
             }
         }
 
-        // Alle 'Sofort' und 'Hoch' Prioritäten einfügen
+        // Alle 'Sofort'und 'Hoch'Prioritäten einfügen
         $finalLines = array_merge($linesImmediate, $linesHigh);
 
-        // Wenn noch Platz ist, fülle mit 'Niedrig' auf. 
+        // Wenn noch Platz ist, fülle mit 'Niedrig'auf. 
         // Das Vestaboard hat genau 6 nutzbare Zeilen.
         $remainingSpace = 6 - count($finalLines);
         if ($remainingSpace > 0) {
@@ -227,9 +227,9 @@ class VestaboardGenerator extends IPSModuleStrict {
         for ($i = 0; $i < 6; $i++) {
             if (isset($finalLines[$i])) {
                 $textBasis .= $finalLines[$i]['text'] . "\n";
-                $this->SetValue("Line" . ($i + 1), $finalLines[$i]['clean']);
+                $this->SetValue("Line". ($i + 1), $finalLines[$i]['clean']);
             } else {
-                $this->SetValue("Line" . ($i + 1), "");
+                $this->SetValue("Line". ($i + 1), "");
             }
         }
         $textBasis = rtrim($textBasis, "\n"); // Letzten Zeilenumbruch entfernen
@@ -274,11 +274,11 @@ class VestaboardGenerator extends IPSModuleStrict {
                     $sleepText = $this->SanitizeTextForVestaboard($sleepText);
                     VESTA_SendMessage($instId, $sleepText);
                 } else {
-                    IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . "Aktualisierung uebersprungen (Ruhezeit aktiv: " . $currentHour . " Uhr)");
+                    IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: '. "Aktualisierung uebersprungen (Ruhezeit aktiv: ". $currentHour . "Uhr)");
                 }
             }
         } else {
-            IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . "Keine gueltige Vestaboard Local Instanz hinterlegt.");
+            IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: '. "Keine gueltige Vestaboard Local Instanz hinterlegt.");
         }
     }
 
@@ -302,7 +302,7 @@ class VestaboardGenerator extends IPSModuleStrict {
     private function GetLineText(string $type, int $id, string $format): string {
         $text = "";
         
-        if ($type !== 'text' && $type !== 'empty') {
+        if ($type !== 'text'&& $type !== 'empty') {
             if ($id <= 0 || !IPS_VariableExists($id)) {
                 return "";
             }
@@ -320,8 +320,8 @@ class VestaboardGenerator extends IPSModuleStrict {
             case 'tr':
                 $prozent = max(0, min(100, (int)GetValue($id)));
                 if ($prozent > 0) {
-                    $prefix = ($type === 'tr') ? "TR" : "WM";
-                    $color = ($type === 'tr') ? "{67}" : "{68}";
+                    $prefix = ($type === 'tr') ? "TR": "WM";
+                    $color = ($type === 'tr') ? "{67}": "{68}";
                     
                     if ($format != "") {
                         if (preg_match('/\{\d{1,2}\}/', $format, $matches)) {
@@ -345,7 +345,7 @@ class VestaboardGenerator extends IPSModuleStrict {
                     if (strpos($format, '%s') !== false || strpos($format, '%f') !== false) {
                         $textStr = sprintf($format, round($temp, 1));
                     } else {
-                        // Wenn sie z.B. nur "Pool: " eingegeben haben
+                        // Wenn sie z.B. nur "Pool: "eingegeben haben
                         $textStr = $format . round($temp, 1) . "{62}C";
                     }
                 } else {
@@ -366,7 +366,7 @@ class VestaboardGenerator extends IPSModuleStrict {
                     $days = 0; // Heute
                 } else if (is_int($val) || is_float($val)) {
                     // Profile value? Wenn die Variable ein Profil hat, liefert IPSymcon evtl einen int.
-                    // Falls es sich um "Tage" handelt:
+                    // Falls es sich um "Tage"handelt:
                     $days = (int)$val;
                     if ($days <= 2) { 
                         $isActive = true;
@@ -407,7 +407,7 @@ class VestaboardGenerator extends IPSModuleStrict {
                         if ($format != "") {
                             if ($isStringVal) {
                                 // "Morgen: Bio"
-                                $prefix = $format . " " . $prefix;
+                                $prefix = $format . "". $prefix;
                             } else {
                                 $prefix = $format;
                             }
@@ -417,11 +417,11 @@ class VestaboardGenerator extends IPSModuleStrict {
                     $suffix = "";
                     if (!$isStringVal) {
                         if ($days === 0) {
-                            $suffix = " Heute!";
+                            $suffix = "Heute!";
                         } else if ($days === 1) {
-                            $suffix = " Morgen";
+                            $suffix = "Morgen";
                         } else if ($days === 2) {
-                            $suffix = " in 2 Tagen";
+                            $suffix = "in 2 Tagen";
                         }
                     }
 
@@ -431,7 +431,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             case 'custom':
                 $val = GetValue($id);
                 if (is_bool($val)) {
-                    $val = $val ? 'Ein' : 'Aus';
+                    $val = $val ? 'Ein': 'Aus';
                 } else {
                     $val = trim((string)$val);
                 }
@@ -477,7 +477,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         $leftText = $this->SanitizeTextForVestaboard($leftText);
         // Smart-Extraktion: Wenn das rechte Icon leer ist, aber der User am Ende des Textes
         // einen Farbcode (z.B. {66}) angegeben hat, ziehen wir diesen automatisch nach ganz rechts.
-        if ($rightIcon === "" && preg_match('/\s*(\{\d{1,2}\})\s*$/', $leftText, $matches)) {
+        if ($rightIcon === ""&& preg_match('/\s*(\{\d{1,2}\})\s*$/', $leftText, $matches)) {
             $rightIcon = $matches[1];
             $leftText = preg_replace('/\s*\{\d{1,2}\}\s*$/', '', $leftText);
         }
@@ -493,14 +493,14 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
         
         $spacesNeeded = 22 - $leftLen - $rightLen;
-        return $leftText . str_repeat(" ", max(0, $spacesNeeded)) . $rightIcon;
+        return $leftText . str_repeat("", max(0, $spacesNeeded)) . $rightIcon;
     }
 
     private function GenerateProgressBar(string $prefix, int $prozent, string $defaultColor): string {
         $prefix = $this->SanitizeTextForVestaboard($prefix);
-        $colorCode = ($prozent >= 100) ? "{66}" : $defaultColor;
+        $colorCode = ($prozent >= 100) ? "{66}": $defaultColor;
         
-        $suffix = sprintf(" %d%%:", $prozent);
+        $suffix = sprintf("%d%%:", $prozent);
         $prefixLen = mb_strlen($prefix, 'UTF-8');
         $suffixLen = mb_strlen($suffix, 'UTF-8');
         
@@ -517,7 +517,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             $gefuellteSpalten = (int)round(($prozent / 100) * $balkenBreite);
             $leereSpalten = $balkenBreite - $gefuellteSpalten;
             
-            $balken = str_repeat($colorCode, $gefuellteSpalten) . str_repeat(" ", $leereSpalten);
+            $balken = str_repeat($colorCode, $gefuellteSpalten) . str_repeat("", $leereSpalten);
             return $text . $balken;
         }
         return $text;
@@ -537,7 +537,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             }
         }
 
-        if ($sleepText !== "" && $instId > 0 && IPS_InstanceExists($instId) && !$isAbsent) {
+        if ($sleepText !== ""&& $instId > 0 && IPS_InstanceExists($instId) && !$isAbsent) {
             $sleepText = $this->SanitizeTextForVestaboard($sleepText);
             VESTA_SendMessage($instId, $sleepText);
         }
@@ -588,7 +588,7 @@ class VestaboardGenerator extends IPSModuleStrict {
 
     protected function LogMessage(string $Message, int $Type): bool
     {
-        IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: ' . $Message);
+        IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardGenerator: '. $Message);
         return true;
     }
 
@@ -733,7 +733,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         },
         {
             "type": "ExpansionPanel",
-            "caption": "⚙️ Allgemeine Einstellungen",
+            "caption": "⚙ Allgemeine Einstellungen",
             "items": [
                 {
                     "type": "Label",
