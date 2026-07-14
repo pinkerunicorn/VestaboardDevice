@@ -355,6 +355,45 @@ class VestaboardGenerator extends IPSModuleStrict {
                 
                 $text = $this->PadToRight($textStr, $color);
                 break;
+            case 'trash':
+                $val = GetValue($id);
+                $days = -1;
+                $isActive = false;
+
+                if (is_bool($val)) {
+                    $isActive = $val;
+                    $days = 0; // Heute
+                } else if (is_int($val) || is_float($val)) {
+                    $days = (int)$val;
+                    if ($days <= 2) { 
+                        $isActive = true;
+                    }
+                }
+
+                if ($isActive) {
+                    $color = "{65}"; // Standard Gelb
+                    $prefix = "Müll";
+                    if ($format != "") {
+                        if (preg_match('/\{\d{1,2}\}/', $format, $matches)) {
+                            $color = $matches[0];
+                            $prefix = trim(str_replace($color, "", $format));
+                        } else {
+                            $prefix = $format;
+                        }
+                    }
+
+                    $suffix = "";
+                    if ($days === 0) {
+                        $suffix = " Heute!";
+                    } else if ($days === 1) {
+                        $suffix = " Morgen";
+                    } else if ($days === 2) {
+                        $suffix = " in 2 Tagen";
+                    }
+
+                    $text = $this->PadToRight($prefix . $suffix, $color);
+                }
+                break;
             case 'custom':
                 $val = GetValue($id);
                 if (is_bool($val)) {
@@ -524,11 +563,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         return <<<'EOT'
 {
     "elements": [
-        {
-            "type": "ExpansionPanel",
-            "caption": "⚙️ ",
-            "items": []
-        },
+
         {
             "type": "List",
             "name": "VariablesList",
@@ -606,6 +641,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                         {
                             "label": "Temperatur",
                             "value": "aussen"
+                        },
+                        {
+                            "label": "Müllabfuhr (Tage/Wahr)",
+                            "value": "trash"
                         }
                     ],
                     "width": "200px",
@@ -628,6 +667,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                             {
                                 "label": "Temperatur",
                                 "value": "aussen"
+                            },
+                            {
+                                "label": "Müllabfuhr (Tage/Wahr)",
+                                "value": "trash"
                             }
                         ]
                     }
@@ -655,87 +698,93 @@ class VestaboardGenerator extends IPSModuleStrict {
             ]
         },
         {
-            "type": "Label",
-            "caption": "Ziel-Instanz"
-        },
-        {
-            "type": "SelectInstance",
-            "name": "InstIdVestaboardLocal",
-            "caption": "Vestaboard Local Instanz"
-        },
-        {
-            "type": "Label",
-            "caption": "Manueller Trigger"
-        },
-        {
-            "type": "SelectVariable",
-            "name": "ManualUpdateTriggerID",
-            "caption": "Auslöser-Variable (z.B. Button oder Schalter, aktualisiert sofort)"
-        },
-        {
-            "type": "Label",
-            "caption": "Haus-Modus"
-        },
-        {
-            "type": "SelectVariable",
-            "name": "HouseModeVariableID",
-            "caption": "Haus-Modus Variable (z.B. vom SmartHome Controller)"
-        },
-        {
-            "type": "Label",
-            "caption": "Heimkino-Modus"
-        },
-        {
-            "type": "ValidationTextBox",
-            "name": "HeimkinoModeValues",
-            "caption": "Modus IDs (für Heimkino, z.B. 3 oder 3,4)"
-        },
-        {
-            "type": "Label",
-            "caption": "Abwesenheits-Modus"
-        },
-        {
-            "type": "ValidationTextBox",
-            "name": "AbsenceModeValues",
-            "caption": "Modus IDs (für Abwesend, z.B. 1 oder 1,2)"
-        },
-        {
-            "type": "Label",
-            "caption": "Aktivitäts-Zeitraum (außerhalb dieser Stunden wird nicht gesendet)"
-        },
-        {
-            "type": "RowLayout",
+            "type": "ExpansionPanel",
+            "caption": "⚙️ Allgemeine Einstellungen",
             "items": [
                 {
-                    "type": "NumberSpinner",
-                    "name": "ActiveTimeStart",
-                    "caption": "Start-Stunde (z.B. 7)",
-                    "minimum": 0,
-                    "maximum": 23
+                    "type": "Label",
+                    "caption": "Ziel-Instanz"
+                },
+                {
+                    "type": "SelectInstance",
+                    "name": "InstIdVestaboardLocal",
+                    "caption": "Vestaboard Local Instanz"
+                },
+                {
+                    "type": "Label",
+                    "caption": "Manueller Trigger"
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "ManualUpdateTriggerID",
+                    "caption": "Auslöser-Variable (z.B. Button oder Schalter, aktualisiert sofort)"
+                },
+                {
+                    "type": "Label",
+                    "caption": "Haus-Modus"
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "HouseModeVariableID",
+                    "caption": "Haus-Modus Variable (z.B. vom SmartHome Controller)"
+                },
+                {
+                    "type": "Label",
+                    "caption": "Heimkino-Modus"
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "HeimkinoModeValues",
+                    "caption": "Modus IDs (für Heimkino, z.B. 3 oder 3,4)"
+                },
+                {
+                    "type": "Label",
+                    "caption": "Abwesenheits-Modus"
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "AbsenceModeValues",
+                    "caption": "Modus IDs (für Abwesend, z.B. 1 oder 1,2)"
+                },
+                {
+                    "type": "Label",
+                    "caption": "Aktivitäts-Zeitraum (außerhalb dieser Stunden wird nicht gesendet)"
+                },
+                {
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "NumberSpinner",
+                            "name": "ActiveTimeStart",
+                            "caption": "Start-Stunde (z.B. 7)",
+                            "minimum": 0,
+                            "maximum": 23
+                        },
+                        {
+                            "type": "NumberSpinner",
+                            "name": "ActiveTimeEnd",
+                            "caption": "End-Stunde (z.B. 22)",
+                            "minimum": 0,
+                            "maximum": 23
+                        }
+                    ]
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "SleepText",
+                    "caption": "Abschalttext (wird beim Erreichen der End-Stunde gesendet, falls nicht leer)"
+                },
+                {
+                    "type": "Label",
+                    "caption": "Puffer-Zeit für Updates (in Minuten)"
                 },
                 {
                     "type": "NumberSpinner",
-                    "name": "ActiveTimeEnd",
-                    "caption": "End-Stunde (z.B. 22)",
-                    "minimum": 0,
-                    "maximum": 23
+                    "name": "UpdateDelayMinutes",
+                    "caption": "Sammel-Verzögerung für Updates (in Minuten)",
+                    "minimum": 0
                 }
             ]
-        },
-        {
-            "type": "ValidationTextBox",
-            "name": "SleepText",
-            "caption": "Abschalttext (wird beim Erreichen der End-Stunde gesendet, falls nicht leer)"
-        },
-        {
-            "type": "Label",
-            "caption": "Puffer-Zeit für Updates (in Minuten)"
-        },
-        {
-            "type": "NumberSpinner",
-            "name": "UpdateDelayMinutes",
-            "caption": "Sammel-Verzögerung für Updates (in Minuten)",
-            "minimum": 0
         }
     ],
     "actions": [
