@@ -494,7 +494,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         }
         
         $spacesNeeded = 22 - $leftLen - $rightLen;
-        return $leftText . str_repeat("", max(0, $spacesNeeded)) . $rightIcon;
+        return $leftText . str_repeat(" ", max(0, $spacesNeeded)) . $rightIcon;
     }
 
     private function GenerateProgressBar(string $prefix, int $prozent, string $defaultColor): string {
@@ -518,7 +518,7 @@ class VestaboardGenerator extends IPSModuleStrict {
             $gefuellteSpalten = (int)round(($prozent / 100) * $balkenBreite);
             $leereSpalten = $balkenBreite - $gefuellteSpalten;
             
-            $balken = str_repeat($colorCode, $gefuellteSpalten) . str_repeat("", $leereSpalten);
+            $balken = str_repeat($colorCode, $gefuellteSpalten) . str_repeat(" ", $leereSpalten);
             return $text . $balken;
         }
         return $text;
