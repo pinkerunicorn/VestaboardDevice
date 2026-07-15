@@ -27,6 +27,7 @@ class VestaboardGenerator extends IPSModuleStrict {
 
         for ($i = 1; $i <= 6; $i++) {
             $this->RegisterVariableString("Line{$i}", "Zeile {$i}", "", $i);
+            IPS_SetIcon($this->GetIDForIdent("Line{$i}"), 'List');
         }
     }
 
