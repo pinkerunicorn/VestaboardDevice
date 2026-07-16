@@ -329,7 +329,7 @@ class VestaboardGenerator extends IPSModuleStrict {
                             $color = $matches[0];
                             $prefix = ltrim(str_replace($color, "", $format));
                         } else {
-                            $prefix = $format;
+                            $prefix = ltrim($format);
                         }
                     }
                     
@@ -342,6 +342,7 @@ class VestaboardGenerator extends IPSModuleStrict {
                 if ($temp < 0) $color = "{67}"; // Blau (Kalt)
                 if ($temp > 25) $color = "{63}"; // Rot (Warm)
                 
+                $format = ltrim($format);
                 if ($format != "") {
                     if (strpos($format, '%s') !== false || strpos($format, '%f') !== false) {
                         $textStr = sprintf($format, round($temp, 1));
@@ -400,6 +401,7 @@ class VestaboardGenerator extends IPSModuleStrict {
                         $prefix = "Müll";
                     }
 
+                    $format = ltrim($format);
                     // Format überschreibt Farbe oder hängt was an
                     if ($format != "") {
                         if (preg_match('/\{\d{1,2}\}/', $format, $matches)) {
@@ -443,6 +445,7 @@ class VestaboardGenerator extends IPSModuleStrict {
                     return "";
                 }
                 
+                $format = ltrim($format);
                 if ($format != "") {
                     if (strpos($format, '%s') !== false || strpos($format, '%d') !== false || strpos($format, '%f') !== false) {
                         $text = sprintf($format, $val);
