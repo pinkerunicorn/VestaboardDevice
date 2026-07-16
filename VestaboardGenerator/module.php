@@ -327,7 +327,7 @@ class VestaboardGenerator extends IPSModuleStrict {
                     if ($format != "") {
                         if (preg_match('/\{\d{1,2}\}/', $format, $matches)) {
                             $color = $matches[0];
-                            $prefix = trim(str_replace($color, "", $format));
+                            $prefix = ltrim(str_replace($color, "", $format));
                         } else {
                             $prefix = $format;
                         }
@@ -347,7 +347,8 @@ class VestaboardGenerator extends IPSModuleStrict {
                         $textStr = sprintf($format, round($temp, 1));
                     } else {
                         // Wenn sie z.B. nur "Pool: "eingegeben haben
-                        $textStr = $format . round($temp, 1) . "{62}C";
+                        $spacer = (!empty($format) && substr($format, -1) !== ' ') ? ' ' : '';
+                        $textStr = $format . $spacer . round($temp, 1) . "{62}C";
                     }
                 } else {
                     // Standardausgabe nur die Zahl + C
@@ -403,12 +404,13 @@ class VestaboardGenerator extends IPSModuleStrict {
                     if ($format != "") {
                         if (preg_match('/\{\d{1,2}\}/', $format, $matches)) {
                             $color = $matches[0];
-                            $format = trim(str_replace($color, "", $format));
+                            $format = ltrim(str_replace($color, "", $format));
                         }
                         if ($format != "") {
                             if ($isStringVal) {
                                 // "Morgen: Bio"
-                                $prefix = $format . "". $prefix;
+                                $spacer = (!empty($format) && substr($format, -1) !== ' ') ? ' ' : '';
+                                $prefix = $format . $spacer . $prefix;
                             } else {
                                 $prefix = $format;
                             }
@@ -445,7 +447,8 @@ class VestaboardGenerator extends IPSModuleStrict {
                     if (strpos($format, '%s') !== false || strpos($format, '%d') !== false || strpos($format, '%f') !== false) {
                         $text = sprintf($format, $val);
                     } else {
-                        $text = $format . $val;
+                        $spacer = (!empty($format) && substr($format, -1) !== ' ' && substr($val, 0, 1) !== ' ') ? ' ' : '';
+                        $text = $format . $spacer . $val;
                     }
                 } else {
                     $text = $val;
@@ -501,7 +504,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         $prefix = $this->SanitizeTextForVestaboard($prefix);
         $colorCode = ($prozent >= 100) ? "{66}": $defaultColor;
         
-        $suffix = sprintf("%d%%:", $prozent);
+        $suffix = sprintf("%d%% ", $prozent);
         $prefixLen = mb_strlen($prefix, 'UTF-8');
         $suffixLen = mb_strlen($suffix, 'UTF-8');
         
