@@ -10,6 +10,7 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->RegisterPropertyString("VariablesList", "[]");
         $this->RegisterPropertyInteger("InstIdVestaboardLocal", 0); // Die InstanzID vom Vestaboard Local Modul
         $this->RegisterPropertyInteger("ManualUpdateTriggerID", 0); // Trigger für manuelles Update
+        $this->RegisterPropertyInteger("ActiveViewVariableID", 0); // Trigger für Multi-View
         $this->RegisterPropertyInteger("HouseModeVariableID", 0); // Globale Haus-Modus Variable
         $this->RegisterPropertyInteger("HeimkinoModeVariableID", 0); // Veraltet
         $this->RegisterPropertyString("HeimkinoModeValues", "3"); // Die IDs des Heimkino-Modus (kommagetrennt)
@@ -44,6 +45,10 @@ class VestaboardGenerator extends IPSModuleStrict {
         $ref_ManualUpdateTriggerID = $this->ReadPropertyInteger('ManualUpdateTriggerID');
         if ($ref_ManualUpdateTriggerID > 1 && @IPS_ObjectExists($ref_ManualUpdateTriggerID)) {
             $this->RegisterReference($ref_ManualUpdateTriggerID);
+        }
+        $ref_ActiveViewVariableID = $this->ReadPropertyInteger('ActiveViewVariableID');
+        if ($ref_ActiveViewVariableID > 1 && @IPS_ObjectExists($ref_ActiveViewVariableID)) {
+            $this->RegisterReference($ref_ActiveViewVariableID);
         }
         $ref_HouseModeVariableID = $this->ReadPropertyInteger('HouseModeVariableID');
         if ($ref_HouseModeVariableID > 1 && @IPS_ObjectExists($ref_HouseModeVariableID)) {
@@ -84,6 +89,11 @@ class VestaboardGenerator extends IPSModuleStrict {
             $this->RegisterMessage($triggerId, VM_UPDATE);
         }
         
+        $activeViewId = $this->ReadPropertyInteger("ActiveViewVariableID");
+        if ($activeViewId > 0 && IPS_VariableExists($activeViewId)) {
+            $this->RegisterMessage($activeViewId, VM_UPDATE);
+        }
+        
         // Migration zu HouseModeVariableID
         $houseModeId = $this->ReadPropertyInteger("HouseModeVariableID");
         if ($houseModeId == 0) {
@@ -118,6 +128,12 @@ class VestaboardGenerator extends IPSModuleStrict {
         $triggerId = $this->ReadPropertyInteger("ManualUpdateTriggerID");
         if ($triggerId > 0 && $SenderID == $triggerId) {
             $this->DoUpdateBoard(true); // Manuelles Update erzwingen
+            return;
+        }
+
+        $activeViewId = $this->ReadPropertyInteger("ActiveViewVariableID");
+        if ($activeViewId > 0 && $SenderID == $activeViewId) {
+            $this->DoUpdateBoard(true); // Ansicht wurde gewechselt
             return;
         }
 
@@ -194,8 +210,20 @@ class VestaboardGenerator extends IPSModuleStrict {
             $list = [];
         }
 
+        $activeViewId = $this->ReadPropertyInteger("ActiveViewVariableID");
+        $currentView = 1;
+        if ($activeViewId > 0 && IPS_VariableExists($activeViewId)) {
+            $currentView = (int)GetValue($activeViewId);
+            if ($currentView < 1) $currentView = 1;
+        }
+
         foreach ($list as $row) {
             if (!$row['Active'] || $row['VariableID'] == 0) {
+                continue;
+            }
+            
+            $rowView = isset($row['View']) ? (int)$row['View'] : 1;
+            if ($rowView !== $currentView) {
                 continue;
             }
             
@@ -623,6 +651,32 @@ class VestaboardGenerator extends IPSModuleStrict {
             "changeOrder": true,
             "columns": [
                 {
+                    "name": "View",
+                    "caption": "Ansicht",
+                    "type": "Select",
+                    "options": [
+                        {"label": "Ansicht 1", "value": 1},
+                        {"label": "Ansicht 2", "value": 2},
+                        {"label": "Ansicht 3", "value": 3},
+                        {"label": "Ansicht 4", "value": 4},
+                        {"label": "Ansicht 5", "value": 5},
+                        {"label": "Ansicht 6", "value": 6}
+                    ],
+                    "width": "100px",
+                    "add": 1,
+                    "edit": {
+                        "type": "Select",
+                        "options": [
+                            {"label": "Ansicht 1", "value": 1},
+                            {"label": "Ansicht 2", "value": 2},
+                            {"label": "Ansicht 3", "value": 3},
+                            {"label": "Ansicht 4", "value": 4},
+                            {"label": "Ansicht 5", "value": 5},
+                            {"label": "Ansicht 6", "value": 6}
+                        ]
+                    }
+                },
+                {
                     "name": "Priority",
                     "caption": "Prio",
                     "type": "Select",
@@ -767,6 +821,15 @@ class VestaboardGenerator extends IPSModuleStrict {
                     "type": "SelectVariable",
                     "name": "ManualUpdateTriggerID",
                     "caption": "Auslöser-Variable (z.B. Button oder Schalter, aktualisiert sofort)"
+                },
+                {
+                    "type": "Label",
+                    "caption": "Aktive Ansicht"
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "ActiveViewVariableID",
+                    "caption": "Variable zur Ansichts-Umschaltung (1 bis 6)"
                 },
                 {
                     "type": "Label",
