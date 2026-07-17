@@ -106,7 +106,7 @@ class VestaboardLocal extends IPSModuleStrict {
             curl_close($chLocal);
             
             if ($localHttpCode >= 200 && $localHttpCode < 300) {
-                IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardLocal: ' . "Erfolgreich kompiliert und lokal gesendet.");
+                // IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardLocal: ' . "Erfolgreich kompiliert und lokal gesendet.");
                 return true;
             } else {
                 IPS_LogMessage('SmartVillaKunterbunt', 'VestaboardLocal: ' . "Lokaler API Fehler! HTTP Code: " . $localHttpCode . " Response: " . $responseLocal);

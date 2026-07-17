@@ -34,6 +34,13 @@ class VestaboardGenerator extends IPSModuleStrict {
     public function ApplyChanges(): void {
         parent::ApplyChanges();
         // --- Auto-generated References ---
+        foreach ($this->GetReferenceList() as $refID) {
+            $this->UnregisterReference($refID);
+        }
+        $ref_InstIdVestaboardLocal = $this->ReadPropertyInteger('InstIdVestaboardLocal');
+        if ($ref_InstIdVestaboardLocal > 1 && @IPS_ObjectExists($ref_InstIdVestaboardLocal)) {
+            $this->RegisterReference($ref_InstIdVestaboardLocal);
+        }
         $ref_ManualUpdateTriggerID = $this->ReadPropertyInteger('ManualUpdateTriggerID');
         if ($ref_ManualUpdateTriggerID > 1 && @IPS_ObjectExists($ref_ManualUpdateTriggerID)) {
             $this->RegisterReference($ref_ManualUpdateTriggerID);
@@ -42,13 +49,14 @@ class VestaboardGenerator extends IPSModuleStrict {
         if ($ref_HouseModeVariableID > 1 && @IPS_ObjectExists($ref_HouseModeVariableID)) {
             $this->RegisterReference($ref_HouseModeVariableID);
         }
-        $ref_HeimkinoModeVariableID = $this->ReadPropertyInteger('HeimkinoModeVariableID');
-        if ($ref_HeimkinoModeVariableID > 1 && @IPS_ObjectExists($ref_HeimkinoModeVariableID)) {
-            $this->RegisterReference($ref_HeimkinoModeVariableID);
-        }
-        $ref_AbsenceModeVariableID = $this->ReadPropertyInteger('AbsenceModeVariableID');
-        if ($ref_AbsenceModeVariableID > 1 && @IPS_ObjectExists($ref_AbsenceModeVariableID)) {
-            $this->RegisterReference($ref_AbsenceModeVariableID);
+        $list_VariablesList = json_decode($this->ReadPropertyString('VariablesList'), true);
+        if (is_array($list_VariablesList)) {
+            foreach ($list_VariablesList as $item) {
+                $vid = $item['VariableID'] ?? 0;
+                if ($vid > 1 && @IPS_ObjectExists($vid)) {
+                    $this->RegisterReference($vid);
+                }
+            }
         }
         // ---------------------------------
 
