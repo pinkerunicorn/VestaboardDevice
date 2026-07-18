@@ -642,6 +642,10 @@ class VestaboardGenerator extends IPSModuleStrict {
     "elements": [
 
         {
+            "type": "Label",
+            "label": "Hier legst du fest, welche Variablen auf deinem Board angezeigt werden sollen. Weise ihnen Ansichten, Prioritäten und Formate zu."
+        },
+        {
             "type": "List",
             "name": "VariablesList",
             "caption": "Variablen Zuordnung",
@@ -809,6 +813,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                     "caption": "Ziel-Instanz"
                 },
                 {
+                    "type": "Label",
+                    "label": "Wähle hier die 'Vestaboard Local' Instanz aus, an die die generierten Daten gesendet werden."
+                },
+                {
                     "type": "SelectInstance",
                     "name": "InstIdVestaboardLocal",
                     "caption": "Vestaboard Local Instanz"
@@ -816,6 +824,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                 {
                     "type": "Label",
                     "caption": "Manueller Trigger"
+                },
+                {
+                    "type": "Label",
+                    "label": "Hier kannst du eine Variable (z.B. einen Schalter) auswählen, um das Board sofort zu aktualisieren."
                 },
                 {
                     "type": "SelectVariable",
@@ -827,6 +839,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                     "caption": "Aktive Ansicht"
                 },
                 {
+                    "type": "Label",
+                    "label": "Wähle eine Variable, über die du zwischen den verschiedenen Ansichten (1 bis 6) umschalten kannst."
+                },
+                {
                     "type": "SelectVariable",
                     "name": "ActiveViewVariableID",
                     "caption": "Variable zur Ansichts-Umschaltung (1 bis 6)"
@@ -834,6 +850,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                 {
                     "type": "Label",
                     "caption": "Haus-Modus"
+                },
+                {
+                    "type": "Label",
+                    "label": "Wenn du eine Variable für deinen Haus-Modus hast, wähle sie hier aus."
                 },
                 {
                     "type": "SelectVariable",
@@ -845,6 +865,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                     "caption": "Heimkino-Modus"
                 },
                 {
+                    "type": "Label",
+                    "label": "Trage hier die Werte (kommagetrennt) deiner Haus-Modus Variable ein, bei denen das Board im Heimkino-Betrieb stumm bleiben soll."
+                },
+                {
                     "type": "ValidationTextBox",
                     "name": "HeimkinoModeValues",
                     "caption": "Modus IDs (für Heimkino, z.B. 3 oder 3,4)"
@@ -854,6 +878,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                     "caption": "Abwesenheits-Modus"
                 },
                 {
+                    "type": "Label",
+                    "label": "Trage hier die Werte (kommagetrennt) für Abwesenheit ein. Dann wird ebenfalls nichts gesendet."
+                },
+                {
                     "type": "ValidationTextBox",
                     "name": "AbsenceModeValues",
                     "caption": "Modus IDs (für Abwesend, z.B. 1 oder 1,2)"
@@ -861,6 +889,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                 {
                     "type": "Label",
                     "caption": "Aktivitäts-Zeitraum (außerhalb dieser Stunden wird nicht gesendet)"
+                },
+                {
+                    "type": "Label",
+                    "label": "Stelle hier ein, von wann bis wann das Board aktiv sein soll. Außerhalb dieser Zeiten geht es in den Ruhemodus."
                 },
                 {
                     "type": "RowLayout",
@@ -889,6 +921,10 @@ class VestaboardGenerator extends IPSModuleStrict {
                 {
                     "type": "Label",
                     "caption": "Puffer-Zeit für Updates (in Minuten)"
+                },
+                {
+                    "type": "Label",
+                    "label": "Damit das Board nicht bei jeder kleinsten Änderung rattert, kannst du hier eine Pufferzeit einstellen. Änderungen werden gesammelt und gemeinsam gesendet."
                 },
                 {
                     "type": "NumberSpinner",

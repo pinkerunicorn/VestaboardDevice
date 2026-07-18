@@ -131,6 +131,10 @@ class VestaboardLocal extends IPSModuleStrict {
             "label": "Verbindungseinstellungen"
         },
         {
+            "type": "Label",
+            "label": "Hier stellst du die Verbindung zu deinem lokalen Vestaboard ein. Trage die IP-Adresse (oder URL) und den API-Key ein."
+        },
+        {
             "type": "RowLayout",
             "items": [
                 {
@@ -148,6 +152,10 @@ class VestaboardLocal extends IPSModuleStrict {
         {
             "type": "Label",
             "label": "Standard Ausrichtung (Alignment)"
+        },
+        {
+            "type": "Label",
+            "label": "Lege hier fest, wie dein Text standardmäßig auf dem Board ausgerichtet werden soll, falls du nichts anderes angibst."
         },
         {
             "type": "Select",
