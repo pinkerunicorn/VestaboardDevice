@@ -187,6 +187,34 @@ class VestaboardGenerator extends IPSModuleStrict {
         $this->DoUpdateBoard($force, false);
     }
 
+    /**
+     * Sendet eine dringende Nachricht sofort auf das Board (z.B. Alarm-Meldungen).
+     * Umgeht das View- und Prioritätssystem — direkte Ausgabe.
+     * Danach wird das Board nach dem konfigurierten Delay wieder normal aktualisiert.
+     *
+     * @param string $text    Der anzuzeigende Text (max. 6 Zeilen, je 22 Zeichen)
+     * @param bool   $resume  Nach Alarm-Anzeige das normale Board wieder herstellen (Standard: false)
+     */
+    public function PushAlert(string $text, bool $resume = false): void {
+        $instId = $this->ReadPropertyInteger("InstIdVestaboardLocal");
+        if ($instId <= 0 || !IPS_InstanceExists($instId)) {
+            $this->LogMessage("PushAlert: Keine gueltige Vestaboard Local Instanz.", KL_WARNING);
+            return;
+        }
+
+        $this->LogMessage("PushAlert: Sende Alarm-Nachricht direkt auf Board.", KL_NOTIFY);
+        try {
+            VESTA_SendMessage($instId, $text);
+        } catch (Exception $e) {
+            $this->LogMessage("PushAlert: Fehler beim Senden: " . $e->getMessage(), KL_ERROR);
+        }
+
+        // Optional: normalen Board-Inhalt nach kurzer Zeit wiederherstellen
+        if ($resume) {
+            $this->SetTimerInterval('VestaboardUpdateTimer', 30 * 1000); // 30s später wieder normal
+        }
+    }
+
     private function DoUpdateBoard(bool $force = false, bool $isHeimkinoTurningOff = false): void {
         $this->SetTimerInterval('VestaboardUpdateTimer', 0);
         
